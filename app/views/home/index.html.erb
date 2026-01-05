@@ -1,0 +1,122 @@
+<div class="min-h-screen bg-surface">
+  <!-- Dark Mode Toggle -->
+  <div class="fixed top-6 right-6 z-50">
+    <button 
+      data-controller="theme" 
+      data-theme-storage-key-value="portfolio_dark_mode"
+      data-action="click->theme#toggle"
+      class="p-3 rounded-lg border border-border bg-surface hover:bg-surface-elevated transition-colors duration-200"
+      aria-label="Toggle dark mode"
+    >
+      <!-- Sun Icon (Light Mode) -->
+      <svg data-theme-target="lightIcon" class="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+      </svg>
+      <!-- Moon Icon (Dark Mode) -->
+      <svg data-theme-target="darkIcon" class="w-5 h-5 text-primary hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero container mx-auto px-6 max-w-6xl">
+    <div class="text-center">
+      <!-- Avatar -->
+      <div class="mb-8 flex justify-center">
+        <img 
+          src="/avatar.jpg" 
+          alt="镐赞" 
+          class="w-32 h-32 rounded-full border-2 border-border shadow-md"
+          loading="eager"
+        >
+      </div>
+      <h1 class="heading-hero mb-6">
+        镐赞
+      </h1>
+      <p class="text-body max-w-2xl mx-auto mb-8">
+        曾为律师、独立开发者、不懂代码的工程师、2025 专注 AI 编程
+      </p>
+      <div class="flex gap-4 justify-center flex-wrap">
+        <a href="#about" class="link-minimal">关于我
+        <a href="#works" class="link-minimal">我的作品
+        <a href="#articles" class="link-minimal">我的文章
+      </div>
+    </div>
+  </section>
+
+  <!-- About Me Section -->
+  <section id="about" class="section container mx-auto px-6 max-w-6xl">
+    <h2 class="heading-section">关于我</h2>
+    <div class="text-body space-y-4">
+      <p>
+        I'm a developer passionate about creating simple, fast, and elegant web applications.
+        I believe in minimalism, clean code, and user-first design.
+      </p>
+      <p>
+        Currently focused on building tools that help people work more efficiently.
+        Open to interesting projects and collaborations.
+      </p>
+      <p>
+        Skills: Ruby on Rails, JavaScript, TypeScript, React, PostgreSQL, and modern web technologies.
+      </p>
+    </div>
+  </section>
+
+  <!-- My Works Section -->
+  <section id="works" class="section container mx-auto px-6 max-w-6xl">
+    <h2 class="heading-section">我的作品</h2>
+    <% if @projects.any? %>
+      <div class="grid-works">
+        <% @projects.each do |project| %>
+          <article class="card-minimal">
+            <h3 class="text-xl font-semibold text-primary mb-3"><%= project.title %></h3>
+            <p class="text-body mb-4">
+              <%= project.description.presence || "A minimal project description." %>
+            </p>
+            <% if project.url.present? && project.url != "#" %>
+              <%= link_to "View Project →", project.url, class: "link-minimal text-sm", target: "_blank", rel: "noopener noreferrer" %>
+            <% end %>
+          </article>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-muted text-center">No projects yet. Coming soon...</p>
+    <% end %>
+  </section>
+
+  <!-- My Articles Section -->
+  <section id="articles" class="section container mx-auto px-6 max-w-6xl">
+    <h2 class="heading-section">我的文章</h2>
+    <% if @articles.any? %>
+      <div class="grid-articles">
+        <% @articles.each do |article| %>
+          <article class="border-b border-border pb-6 last:border-0">
+            <div class="flex justify-between items-start mb-2 gap-4 flex-wrap">
+              <h3 class="text-xl font-semibold text-primary"><%= article.title %></h3>
+              <% if article.published_at.present? %>
+                <time class="text-sm text-muted whitespace-nowrap">
+                  <%= article.published_at.strftime("%b %d, %Y") %>
+                </time>
+              <% end %>
+            </div>
+            <% if article.excerpt.present? %>
+              <p class="text-body mb-3">
+                <%= article.excerpt %>
+              </p>
+            <% end %>
+          </article>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-muted text-center">No articles yet. Coming soon...</p>
+    <% end %>
+  </section>
+
+  <!-- Footer -->
+  <footer class="section container mx-auto px-6 max-w-6xl border-t border-border">
+    <div class="text-center text-muted text-sm">
+      <p>© <%= Time.current.year %> Your Name. Built with Ruby on Rails.</p>
+    </div>
+  </footer>
+</div>
