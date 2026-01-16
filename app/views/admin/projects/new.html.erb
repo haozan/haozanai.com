@@ -61,6 +61,24 @@
           <% end %>
         </div>
 
+        <!-- Cover Image -->
+        <div class="mb-4">
+          <%= form.label :cover_image, class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" do %>
+            Cover Image <span class="text-gray-500 text-xs">(optional, will use og:image from URL if not provided)</span>
+          <% end %>
+          <% if @project.cover_image.attached? %>
+            <div class="mb-3">
+              <%= image_tag @project.cover_image, class: "w-64 h-auto border border-gray-300 dark:border-gray-600 rounded-lg" %>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Current cover image</p>
+            </div>
+          <% end %>
+          <%= form.file_field :cover_image, {
+            accept: "image/*",
+            class: "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-50"
+          } %>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Upload a custom cover image. If not provided, the system will automatically fetch og:image from the project URL.</p>
+        </div>
+
         <!-- Status -->
         <div class="mb-4">
           <%= form.label :status, class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" do %>

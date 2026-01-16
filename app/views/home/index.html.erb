@@ -35,7 +35,7 @@
         镐赞
       </h1>
       <p class="text-body max-w-2xl mx-auto mb-8">
-        曾为律师、独立开发者、不懂代码的工程师、2025 专注 AI 编程
+        律师、独立开发者、不懂代码的工程师、2025 专注 AI 编程
       </p>
       <div class="flex gap-4 justify-center flex-wrap">
         <a href="#about" class="link-minimal">关于我</a>
@@ -71,10 +71,10 @@
         <% @projects.each do |project| %>
           <% if project.url.present? && project.url != "#" %>
             <a href="<%= project.url %>" target="_blank" rel="noopener noreferrer" class="group overflow-hidden border border-border bg-surface hover:shadow-lg transition-all duration-300 block no-underline">
-              <% if project.cover_image_url.present? %>
+              <% if project.display_cover_url.present? %>
                 <div class="w-full aspect-[1.91/1] bg-surface-elevated overflow-hidden">
                   <img 
-                    src="<%= project.cover_image_url %>" 
+                    src="<%= project.display_cover_url %>" 
                     alt="<%= project.title %>" 
                     class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     loading="lazy"
@@ -91,10 +91,10 @@
             </a>
           <% else %>
             <article class="group overflow-hidden border border-border bg-surface hover:shadow-lg transition-all duration-300">
-              <% if project.cover_image_url.present? %>
+              <% if project.display_cover_url.present? %>
                 <div class="w-full aspect-[1.91/1] bg-surface-elevated overflow-hidden">
                   <img 
-                    src="<%= project.cover_image_url %>" 
+                    src="<%= project.display_cover_url %>" 
                     alt="<%= project.title %>" 
                     class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     loading="lazy"
@@ -148,7 +148,7 @@
   <!-- Footer -->
   <footer class="section container mx-auto px-6 max-w-6xl border-t border-border">
     <div class="text-center text-muted text-sm space-y-2">
-      <p>© <%= Time.current.year %> Your Name. Built with Ruby on Rails.</p>
+      <p>© <%= Time.current.year %> 镐赞. Built with Ruby on Rails.</p>
       <p>
         <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors">
           粤ICP备16116037号-9

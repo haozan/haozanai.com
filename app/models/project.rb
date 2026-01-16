@@ -1,4 +1,7 @@
 class Project < ApplicationRecord
+  # ActiveStorage attachment
+  has_one_attached :cover_image
+  
   # Validations
   validates :title, presence: true
   validates :status, inclusion: { in: %w[published draft archived] }
@@ -12,6 +15,15 @@ class Project < ApplicationRecord
   scope :by_position, -> { order(position: :asc, created_at: :desc) }
   
   # Methods
+  def display_cover_url
+    # Priority: uploaded image > og:image URL
+    if cover_image.attached?
+      Rails.application.routes.url_helpers.rails_blob_url(cover_image, only_path: true)
+    else
+      cover_image_url
+    end
+  end
+
   def published?
     status == 'published'
   end
