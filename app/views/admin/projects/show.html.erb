@@ -39,6 +39,14 @@
   <div class="card bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
     <div class="card-body">
       <div class="space-y-6">
+        <!-- Cover Image -->
+        <% if @project.cover_image_url.present? %>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Cover Image</label>
+            <img src="<%= @project.cover_image_url %>" alt="<%= @project.title %>" class="w-full max-w-2xl rounded-lg border border-gray-200 dark:border-gray-700" loading="lazy">
+          </div>
+        <% end %>
+
         <!-- Title -->
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Title</label>
@@ -56,7 +64,18 @@
         <!-- Url -->
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Url</label>
-          <div class="text-lg font-medium text-gray-900 dark:text-gray-100"><%= @project.url %></div>
+          <div class="flex items-center gap-3">
+            <div class="text-lg font-medium text-gray-900 dark:text-gray-100 flex-1"><%= @project.url %></div>
+            <%= link_to refresh_cover_admin_project_path(@project), 
+                method: :post,
+                class: "btn-secondary text-sm py-2 px-4",
+                data: { confirm: "Refresh cover image from og:image?" } do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              Refresh Cover
+            <% end %>
+          </div>
         </div>
 
         <!-- Status -->

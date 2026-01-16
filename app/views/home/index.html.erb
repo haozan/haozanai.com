@@ -69,7 +69,18 @@
     <% if @projects.any? %>
       <div class="grid-works">
         <% @projects.each do |project| %>
-          <article class="card-minimal">
+          <article class="card-minimal group">
+            <% if project.cover_image_url.present? %>
+              <div class="mb-4 overflow-hidden rounded-lg border border-border">
+                <img 
+                  src="<%= project.cover_image_url %>" 
+                  alt="<%= project.title %>" 
+                  class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+                  loading="lazy"
+                  onerror="this.parentElement.style.display='none'"
+                >
+              </div>
+            <% end %>
             <h3 class="text-xl font-semibold text-primary mb-3"><%= project.title %></h3>
             <p class="text-body mb-4">
               <%= project.description.presence || "A minimal project description." %>
@@ -115,8 +126,13 @@
 
   <!-- Footer -->
   <footer class="section container mx-auto px-6 max-w-6xl border-t border-border">
-    <div class="text-center text-muted text-sm">
+    <div class="text-center text-muted text-sm space-y-2">
       <p>© <%= Time.current.year %> Your Name. Built with Ruby on Rails.</p>
+      <p>
+        <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors">
+          粤ICP备16116037号-9
+        </a>
+      </p>
     </div>
   </footer>
 </div>

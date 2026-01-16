@@ -22,7 +22,11 @@ Rails.application.routes.draw do
   # Do not write business logic at admin dashboard
   namespace :admin do
     resources :articles
-    resources :projects
+    resources :projects do
+      member do
+        post :refresh_cover
+      end
+    end
     resources :admin_oplogs, only: [:index, :show]
     resources :administrators
     get 'login', to: 'sessions#new', as: :login

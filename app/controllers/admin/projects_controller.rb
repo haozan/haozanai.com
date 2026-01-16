@@ -1,5 +1,5 @@
 class Admin::ProjectsController < Admin::BaseController
-  before_action :set_project, only: [:show, :edit, :update, :destroy]
+  before_action :set_project, only: [:show, :edit, :update, :destroy, :refresh_cover]
 
   def index
     @projects = Project.page(params[:page]).per(10)
@@ -36,6 +36,14 @@ class Admin::ProjectsController < Admin::BaseController
   def destroy
     @project.destroy
     redirect_to admin_projects_path, notice: 'Project was successfully deleted.'
+  end
+
+  def refresh_cover
+    if @project.refresh_cover_image!
+      redirect_to admin_project_path(@project), notice: 'Cover image refreshed successfully.'
+    else
+      redirect_to admin_project_path(@project), alert: 'Failed to fetch cover image. Please check the URL.'
+    end
   end
 
   private
