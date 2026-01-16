@@ -177,6 +177,18 @@
     @apply grid grid-cols-1 gap-6;
   }
 
+  /* Ensure article titles have no underline */
+  .grid-articles h3 {
+    @apply no-underline;
+  }
+
 } /* End of @layer components */
 
 @tailwind utilities;
+
+@layer utilities {
+  /* Force remove underline from article titles */
+  .grid-articles h3 {
+    text-decoration: none !important;
+  }
+}
