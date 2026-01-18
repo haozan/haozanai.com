@@ -16,12 +16,27 @@ class Project < ApplicationRecord
   
   # Methods
   def display_cover_url
-    # Priority: uploaded image > og:image URL
-    if cover_image.attached?
-      Rails.application.routes.url_helpers.rails_blob_url(cover_image, only_path: true)
+    # Priority: external_cover_url > uploaded image > og:image URL
+    if external_cover_url.present?
+      external_cover_url
+    elsif cover_image.attached?
+      # Use optimized variant for better performance
+      optimized_cover_url
     else
       cover_image_url
     end
+  end
+
+  def optimized_cover_url
+    return nil unless cover_image.attached?
+    
+    # Generate optimized variant (1200x628, quality 85%)
+    variant = cover_image.variant(resize_to_limit: [1200, 628], saver: { quality: 85 })
+    Rails.application.routes.url_helpers.rails_blob_url(variant, only_path: true)
+  rescue StandardError => e
+    Rails.logger.error("Failed to generate optimized cover: #{e.message}")
+    # Fallback to original image
+    Rails.application.routes.url_helpers.rails_blob_url(cover_image, only_path: true)
   end
 
   def published?

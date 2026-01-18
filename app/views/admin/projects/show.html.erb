@@ -39,11 +39,58 @@
   <div class="card bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
     <div class="card-body">
       <div class="space-y-6">
-        <!-- Cover Image -->
-        <% if @project.cover_image_url.present? %>
+        <!-- Cover Image Priority Status -->
+        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+          <h3 class="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-3">📸 Cover Image Priority Status</h3>
+          <div class="space-y-2 text-sm">
+            <div class="flex items-start gap-2">
+              <span class="<%= @project.external_cover_url.present? ? 'text-green-600 dark:text-green-400 font-bold' : 'text-gray-400' %>">①</span>
+              <div class="flex-1">
+                <span class="font-medium">External CDN URL:</span>
+                <% if @project.external_cover_url.present? %>
+                  <span class="text-green-600 dark:text-green-400 font-bold ml-2">✓ ACTIVE</span>
+                  <div class="mt-1 text-xs text-gray-600 dark:text-gray-400 break-all"><%= @project.external_cover_url %></div>
+                <% else %>
+                  <span class="text-gray-400 ml-2">Not set</span>
+                <% end %>
+              </div>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="<%= @project.cover_image.attached? && @project.external_cover_url.blank? ? 'text-green-600 dark:text-green-400 font-bold' : 'text-gray-400' %>">②</span>
+              <div class="flex-1">
+                <span class="font-medium">Uploaded Image:</span>
+                <% if @project.cover_image.attached? %>
+                  <span class="<%= @project.external_cover_url.present? ? 'text-yellow-600 dark:text-yellow-400' : 'text-green-600 dark:text-green-400 font-bold' %> ml-2">
+                    <%= @project.external_cover_url.present? ? '✓ Available (not used)' : '✓ ACTIVE' %>
+                  </span>
+                  <div class="mt-1 text-xs text-gray-600 dark:text-gray-400">(Auto-optimized to 1200x628px, quality 85%)</div>
+                <% else %>
+                  <span class="text-gray-400 ml-2">Not uploaded</span>
+                <% end %>
+              </div>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="<%= @project.cover_image_url.present? && @project.external_cover_url.blank? && !@project.cover_image.attached? ? 'text-green-600 dark:text-green-400 font-bold' : 'text-gray-400' %>">③</span>
+              <div class="flex-1">
+                <span class="font-medium">OG:Image from URL:</span>
+                <% if @project.cover_image_url.present? %>
+                  <span class="<%= (@project.external_cover_url.present? || @project.cover_image.attached?) ? 'text-yellow-600 dark:text-yellow-400' : 'text-green-600 dark:text-green-400 font-bold' %> ml-2">
+                    <%= (@project.external_cover_url.present? || @project.cover_image.attached?) ? '✓ Available (not used)' : '✓ ACTIVE' %>
+                  </span>
+                  <div class="mt-1 text-xs text-gray-600 dark:text-gray-400 break-all"><%= @project.cover_image_url %></div>
+                <% else %>
+                  <span class="text-gray-400 ml-2">Not fetched</span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Current Display Cover -->
+        <% if @project.display_cover_url.present? %>
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Cover Image</label>
-            <img src="<%= @project.cover_image_url %>" alt="<%= @project.title %>" class="w-full max-w-2xl rounded-lg border border-gray-200 dark:border-gray-700" loading="lazy">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Current Display Cover</label>
+            <img src="<%= @project.display_cover_url %>" alt="<%= @project.title %>" class="w-full max-w-2xl rounded-lg border border-gray-200 dark:border-gray-700" loading="lazy">
           </div>
         <% end %>
 

@@ -61,22 +61,36 @@
           <% end %>
         </div>
 
+        <!-- External Cover URL (Priority: Highest) -->
+        <div class="mb-4">
+          <%= form.label :external_cover_url, class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" do %>
+            External Cover URL <span class="text-blue-500 text-xs">(Recommended: 七牛云/CDN)</span>
+          <% end %>
+          <%= form.text_field :external_cover_url, {
+            placeholder: "https://cdn.example.com/cover.jpg",
+            class: "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-50"
+          } %>
+          <p class="text-sm text-blue-500 dark:text-blue-400 mt-1 font-medium">⚡ Fastest loading - paste your CDN/七牛云 image URL here for optimal performance</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Recommended: 1200x628px, &lt;200KB, WebP/JPG format</p>
+        </div>
+
         <!-- Cover Image -->
         <div class="mb-4">
           <%= form.label :cover_image, class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" do %>
-            Cover Image <span class="text-gray-500 text-xs">(optional, will use og:image from URL if not provided)</span>
+            Upload Cover Image <span class="text-gray-500 text-xs">(or use URL above/og:image)</span>
           <% end %>
           <% if @project.cover_image.attached? %>
             <div class="mb-3">
               <%= image_tag @project.cover_image, class: "w-64 h-auto border border-gray-300 dark:border-gray-600 rounded-lg" %>
-              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Current cover image</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Current uploaded image (auto-optimized to 1200x628px)</p>
             </div>
           <% end %>
           <%= form.file_field :cover_image, {
             accept: "image/*",
             class: "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-50"
           } %>
-          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Upload a custom cover image. If not provided, the system will automatically fetch og:image from the project URL.</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Priority: External URL > Uploaded Image > og:image from URL</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">📌 Best practice: Upload 1200x628px images. System auto-optimizes larger images.</p>
         </div>
 
         <!-- Status -->
