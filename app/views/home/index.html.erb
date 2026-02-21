@@ -24,18 +24,17 @@
     <div class="text-center">
       <!-- Avatar -->
       <div class="mb-8 flex justify-center">
-        <img 
-          src="/avatar.jpg" 
-          alt="镐赞" 
-          class="w-32 h-32 rounded-full border-2 border-border shadow-md"
-          loading="eager"
-        >
+        <%= image_tag 'app-logo.png', 
+          alt: Rails.application.config.x.appname, 
+          class: 'w-32 h-32 rounded-full shadow-md object-cover',
+          loading: 'eager' 
+        %>
       </div>
       <h1 class="heading-hero mb-6">
-        镐赞
+        <%= Rails.application.config.x.appname %>
       </h1>
       <p class="text-body max-w-2xl mx-auto mb-8">
-        律师、独立开发者、不懂代码的工程师、2025 专注 AI 编程
+        让每一位律师拥有一位 7 x 24 小时全天候 AI 助理
       </p>
       <div class="flex gap-4 justify-center flex-wrap">
         <a href="#about" class="link-minimal">关于我</a>
@@ -148,7 +147,7 @@
   <!-- Footer -->
   <footer class="section container mx-auto px-6 max-w-6xl border-t border-border">
     <div class="text-center text-muted text-sm space-y-2">
-      <p>© <%= Time.current.year %> 镐赞. Built with Ruby on Rails.</p>
+      <p>© <%= Time.current.year %> <%= Rails.application.config.x.appname %>. Built with Ruby on Rails.</p>
       <p>
         <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors">
           粤ICP备16116037号-9
