@@ -37,8 +37,8 @@
         让每一位律师拥有一位 7 x 24 小时全天候 AI 助理
       </p>
       <div class="flex gap-4 justify-center flex-wrap">
-        <a href="#about" class="link-minimal">关于我</a>
-        <a href="#works" class="link-minimal">我的作品</a>
+        <a href="#about" class="link-minimal">关于 OpenClaw</a>
+        <a href="#works" class="link-minimal">工具资源</a>
         <a href="#articles" class="link-minimal">我的文章</a>
       </div>
     </div>
@@ -46,25 +46,26 @@
 
   <!-- About Me Section -->
   <section id="about" class="section container mx-auto px-6 max-w-6xl">
-    <h2 class="heading-section">关于我</h2>
+    <h2 class="heading-section">关于 OpenClaw</h2>
     <div class="text-body space-y-4">
-      <p>
-        I'm a developer passionate about creating simple, fast, and elegant web applications.
-        I believe in minimalism, clean code, and user-first design.
+      <p class="text-lg font-semibold text-primary">
+        一句话介绍：OpenClaw 就像一个住在你电脑里的超级小助手，你通过发消息就能让它帮你完成各种任务，而且完全保护你的隐私！
       </p>
       <p>
-        Currently focused on building tools that help people work more efficiently.
-        Open to interesting projects and collaborations.
+        2025年初，奥地利程序员Peter Steinberger用一个周末时间做了个小工具，最初叫Clawdbot（蟹蠕机器人），只是想让自己少做重复性的电脑任务。
       </p>
       <p>
-        Skills: Ruby on Rails, JavaScript, TypeScript, React, PostgreSQL, and modern web technologies.
+        一年内它经历了三次改名（Clawdbot → Moltbot → OpenClaw），逐渐支持50+工具集成、10万+用户，成为开源AI Agent领域的标杆产品。
+      </p>
+      <p>
+        2026年初，OpenAI CEO Sam Altman亲自宣布Peter加入OpenAI，业界传闻收购价约10亿美元——一个周末项目最终成就了“单人独角兽”的传奇。
       </p>
     </div>
   </section>
 
   <!-- My Works Section -->
   <section id="works" class="section container mx-auto px-6 max-w-6xl">
-    <h2 class="heading-section">我的作品</h2>
+    <h2 class="heading-section">工具资源</h2>
     <% if @projects.any? %>
       <div class="grid-works">
         <% @projects.each do |project| %>
