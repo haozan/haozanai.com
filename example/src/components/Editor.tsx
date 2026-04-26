@@ -19,6 +19,18 @@ const GRADIENT_CLASS_MAP: Record<IGradientTheme, string> = {
   'gradient:lava':    'bg-gradient-lava',
 }
 
+// 纯色主题的增强渐变覆盖（替换库内置的单调渐变）
+const SOLID_OVERRIDE_MAP: Partial<Record<IThemeType, string>> = {
+  blue:   'bg-override-blue',
+  pink:   'bg-override-pink',
+  purple: 'bg-override-purple',
+  green:  'bg-override-green',
+  yellow: 'bg-override-yellow',
+  gray:   'bg-override-gray',
+  red:    'bg-override-red',
+  indigo: 'bg-override-indigo',
+}
+
 const THEMES: { value: IExtendedTheme; label: string }[] = [
   { value: 'SpringGradientWave',  label: '🌊 春日渐变' },
   { value: 'gradient:aurora',     label: '🌅 极光晨曦' },
@@ -273,7 +285,11 @@ export default function Editor() {
           <div className="flex flex-col w-fit">
             <Md2Poster
               theme={theme in GRADIENT_CLASS_MAP ? 'SpringGradientWave' : theme as IThemeType}
-              className={theme in GRADIENT_CLASS_MAP ? GRADIENT_CLASS_MAP[theme as IGradientTheme] : undefined}
+              className={
+                theme in GRADIENT_CLASS_MAP
+                  ? GRADIENT_CLASS_MAP[theme as IGradientTheme]
+                  : SOLID_OVERRIDE_MAP[theme as IThemeType]
+              }
               copySuccessCallback={() => {}} ref={markdownRef}>
               <Md2PosterContent articleClassName="prose prose-gray prose-img:rounded-lg prose-img:border prose-img:opacity-100 text-justify">{mdString}</Md2PosterContent>
               <Md2PosterFooter className='text-center'>
