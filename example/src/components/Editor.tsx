@@ -134,6 +134,8 @@ export default function Editor() {
 
   const handleDownload = async () => {
     setDownloadLoading(true)
+    // CSS counter() 在 SVG foreignObject 里不生效，截图前把 ol li 序号固化为真实 DOM span
+    const injectedSpans: HTMLElement[] = []
     try {
       const root = document.querySelector('.markdown-to-image-root') as HTMLElement
       const posterEl = root?.firstElementChild as HTMLElement
@@ -141,6 +143,32 @@ export default function Editor() {
         alert('下载失败，找不到海报元素')
         return
       }
+
+      // 为每个 ol > li 注入序号 span（截图后移除）
+      document.body.classList.add('screenshot-mode')
+      const olLists = posterEl.querySelectorAll<HTMLOListElement>('article ol')
+      olLists.forEach((ol) => {
+        const items = ol.querySelectorAll<HTMLLIElement>(':scope > li')
+        items.forEach((li, idx) => {
+          const span = document.createElement('span')
+          span.setAttribute('data-marker-inject', '1')
+          span.style.cssText = `
+            position: absolute;
+            left: 0;
+            top: 0;
+            min-width: 1.4em;
+            text-align: left;
+            font-size: 1em;
+            line-height: inherit;
+            color: inherit;
+            pointer-events: none;
+          `
+          span.textContent = `${idx + 1}.`
+          li.appendChild(span)
+          injectedSpans.push(span)
+        })
+      })
+
       const dataUrl = await domToPng(posterEl, { scale: 2 })
       const link = document.createElement('a')
       link.download = `poster-${Date.now()}.png`
@@ -150,6 +178,9 @@ export default function Editor() {
       console.error('下载失败', e)
       alert('下载失败，请重试')
     } finally {
+      // 清理注入的 span
+      injectedSpans.forEach((s) => s.remove())
+      document.body.classList.remove('screenshot-mode')
       setDownloadLoading(false)
     }
   }

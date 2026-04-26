@@ -182,6 +182,10 @@
   content: none !important;
   font-size: 0;
 }
+/* 截图模式：CSS counter 在 SVG foreignObject 不生效，改用注入 span；隐藏 ::before 避免重叠 */
+.screenshot-mode .markdown-to-image-root article ol > li::before {
+  display: none !important;
+}
 
 /* 引用块 blockquote */
 /* ⚠️ 不用 border-left，用 ::before 伪元素画左边线 */
