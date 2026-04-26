@@ -9,14 +9,21 @@ import { domToPng } from 'modern-screenshot'
 
 type IThemeType = 'SpringGradientWave'
 type IGradientTheme = 'gradient:aurora' | 'gradient:galaxy' | 'gradient:forest' | 'gradient:sakura' | 'gradient:lava'
+  | 'gradient:neon' | 'gradient:latte' | 'gradient:nebula' | 'gradient:glacier' | 'gradient:desert' | 'gradient:morandi'
 type IExtendedTheme = IThemeType | IGradientTheme
 
 const GRADIENT_CLASS_MAP: Record<IGradientTheme, string> = {
-  'gradient:aurora':  'bg-gradient-aurora',
-  'gradient:galaxy':  'bg-gradient-galaxy',
-  'gradient:forest':  'bg-gradient-forest',
-  'gradient:sakura':  'bg-gradient-sakura',
-  'gradient:lava':    'bg-gradient-lava',
+  'gradient:aurora':   'bg-gradient-aurora',
+  'gradient:galaxy':   'bg-gradient-galaxy',
+  'gradient:forest':   'bg-gradient-forest',
+  'gradient:sakura':   'bg-gradient-sakura',
+  'gradient:lava':     'bg-gradient-lava',
+  'gradient:neon':     'bg-gradient-neon',
+  'gradient:latte':    'bg-gradient-latte',
+  'gradient:nebula':   'bg-gradient-nebula',
+  'gradient:glacier':  'bg-gradient-glacier',
+  'gradient:desert':   'bg-gradient-desert',
+  'gradient:morandi':  'bg-gradient-morandi',
 }
 
 const THEMES: { value: IExtendedTheme; label: string }[] = [
@@ -26,6 +33,12 @@ const THEMES: { value: IExtendedTheme; label: string }[] = [
   { value: 'gradient:forest',     label: '🍃 翠绿森林' },
   { value: 'gradient:sakura',     label: '🌸 樱花粉梦' },
   { value: 'gradient:lava',       label: '🔥 熔岩日落' },
+  { value: 'gradient:neon',       label: '🌊 霓虹赛博' },
+  { value: 'gradient:latte',      label: '☕ 焦糖拿铁' },
+  { value: 'gradient:nebula',     label: '🌌 星云紫霞' },
+  { value: 'gradient:glacier',    label: '🏔 冰川蓝' },
+  { value: 'gradient:desert',     label: '🌅 沙漠金' },
+  { value: 'gradient:morandi',    label: '🎨 莫兰迪' },
 ]
 
 const defaultMd = `# 青狮海报大师 使用指南
