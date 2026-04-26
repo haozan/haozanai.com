@@ -3,7 +3,21 @@ import React, { useState, ChangeEvent, TextareaHTMLAttributes, useRef } from 're
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from './ui/button'
 import { Md2PosterContent, Md2Poster, Md2PosterHeader, Md2PosterFooter } from 'markdown-to-image'
-import { Copy, LoaderCircle } from 'lucide-react';
+import { Copy, LoaderCircle, Download, Palette } from 'lucide-react';
+
+type IThemeType = 'blue' | 'pink' | 'purple' | 'green' | 'yellow' | 'gray' | 'red' | 'indigo' | 'SpringGradientWave'
+
+const THEMES: { value: IThemeType; label: string }[] = [
+  { value: 'SpringGradientWave', label: '🌊 春日渐变' },
+  { value: 'blue',   label: '🔵 蓝' },
+  { value: 'pink',   label: '🌸 粉' },
+  { value: 'purple', label: '🟣 紫' },
+  { value: 'green',  label: '🟢 绿' },
+  { value: 'yellow', label: '🟡 黄' },
+  { value: 'gray',   label: '⚪ 灰' },
+  { value: 'red',    label: '🔴 红' },
+  { value: 'indigo', label: '🌌 靛蓝' },
+]
 
 const Textarea: React.FC<TextareaHTMLAttributes<HTMLTextAreaElement>> = ({ onChange, ...rest }) => {
   return (
@@ -31,19 +45,52 @@ const defaultMd = `# AI Morning News - April 29th
 
 export default function Editor() {
   const [mdString, setMdString] = useState(defaultMd)
+  const [theme, setTheme] = useState<IThemeType>('SpringGradientWave')
+  const [showThemePicker, setShowThemePicker] = useState(false)
+  const [copyLoading, setCopyLoading] = useState(false)
+  const [downloadLoading, setDownloadLoading] = useState(false)
+  const markdownRef = useRef<any>(null)
+
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setMdString(e.target.value)
   }
-  const markdownRef = useRef<any>(null)
-  const [copyLoading, setCopyLoading] = useState(false)
-  const handleCopyFromChild = () => {
+
+  const handleCopy = () => {
     setCopyLoading(true)
     markdownRef?.current?.handleCopy().then(() => {
       setCopyLoading(false)
       alert('Copy Success!')
-    }).catch(err => {
+    }).catch((err: any) => {
       setCopyLoading(false)
       console.log('err copying from child', err)
+    })
+  }
+
+  const handleDownload = () => {
+    setDownloadLoading(true)
+    markdownRef?.current?.handleCopy().then(() => {
+      // handleCopy 会把图片写入剪贴板，同时我们用 html2canvas 另存为文件
+      // 降级方案：直接用 html2canvas 截图下载
+      const el = document.querySelector('.md2poster-wrap') as HTMLElement
+        || document.querySelector('[class*="md2poster"]') as HTMLElement
+        || (markdownRef?.current?.posterRef?.current as HTMLElement)
+      if (!el) {
+        setDownloadLoading(false)
+        alert('下载失败，找不到海报元素')
+        return
+      }
+      import('html2canvas').then(({ default: html2canvas }) => {
+        html2canvas(el, { useCORS: true, scale: 2 }).then(canvas => {
+          const link = document.createElement('a')
+          link.download = `poster-${Date.now()}.png`
+          link.href = canvas.toDataURL('image/png')
+          link.click()
+          setDownloadLoading(false)
+        })
+      }).catch(() => setDownloadLoading(false))
+    }).catch((err: any) => {
+      setDownloadLoading(false)
+      console.log('err downloading', err)
     })
   }
 
@@ -58,7 +105,7 @@ export default function Editor() {
         {/* Right: Preview */}
         <div className="w-1/2 mx-auto flex justify-center p-4 bg-[#0d1117]">
           <div className="flex flex-col w-fit">
-            <Md2Poster theme="SpringGradientWave" copySuccessCallback={() => {}} ref={markdownRef}>
+            <Md2Poster theme={theme} copySuccessCallback={() => {}} ref={markdownRef}>
               <Md2PosterHeader className="flex justify-center items-center px-4 font-medium text-lg">
                 <span>{new Date().toISOString().slice(0, 10)}</span>
               </Md2PosterHeader>
@@ -72,18 +119,64 @@ export default function Editor() {
         </div>
       </div>
 
-      {/* Copy button */}
+      {/* Action buttons */}
       <div className="absolute top-4 right-4 flex flex-row gap-2 opacity-80 hover:opacity-100 transition-all">
+
+        {/* Theme picker */}
+        <div className="relative">
+          <Button
+            className="rounded-xl bg-[#131920] text-[#00E5CC] font-semibold border border-[#00E5CC]/40
+              hover:bg-[#00E5CC]/10 hover:border-[#00E5CC]/80 transition-all"
+            onClick={() => setShowThemePicker(v => !v)}
+          >
+            <Palette className="w-4 h-4 mr-1" />
+            主题
+          </Button>
+
+          {showThemePicker && (
+            <div className="absolute right-0 top-11 z-50 bg-[#131920] border border-[#00E5CC]/20
+              rounded-xl shadow-glow-cyan p-2 flex flex-col gap-1 min-w-[140px]">
+              {THEMES.map(t => (
+                <button
+                  key={t.value}
+                  onClick={() => { setTheme(t.value); setShowThemePicker(false) }}
+                  className={`px-3 py-2 rounded-lg text-sm text-left transition-colors
+                    ${theme === t.value
+                      ? 'bg-[#00E5CC]/20 text-[#00E5CC] font-semibold'
+                      : 'text-[hsl(220,14%,65%)] hover:bg-[#00E5CC]/10 hover:text-[#00E5CC]'
+                    }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Download button */}
+        <Button
+          className="rounded-xl bg-[#131920] text-[#00E5CC] font-semibold border border-[#00E5CC]/40
+            hover:bg-[#00E5CC]/10 hover:border-[#00E5CC]/80 transition-all"
+          onClick={handleDownload}
+          disabled={downloadLoading}
+        >
+          {downloadLoading
+            ? <LoaderCircle className="w-4 h-4 mr-1 animate-spin" />
+            : <Download className="w-4 h-4 mr-1" />}
+          下载
+        </Button>
+
+        {/* Copy button */}
         <Button
           className="rounded-xl bg-[#00E5CC] text-[#090d14] font-semibold
             hover:bg-[#00E5CC]/90 shadow-glow-cyan border-0"
-          onClick={handleCopyFromChild}
+          onClick={handleCopy}
           disabled={copyLoading}
         >
           {copyLoading
             ? <LoaderCircle className="w-4 h-4 mr-1 animate-spin" />
             : <Copy className="w-4 h-4 mr-1" />}
-          Copy Image
+          复制图片
         </Button>
       </div>
     </ScrollArea>
