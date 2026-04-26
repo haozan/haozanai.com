@@ -8,9 +8,24 @@ import { Copy, LoaderCircle, Download, Palette, ImageUp } from 'lucide-react'
 import { domToPng } from 'modern-screenshot'
 
 type IThemeType = 'blue' | 'pink' | 'purple' | 'green' | 'yellow' | 'gray' | 'red' | 'indigo' | 'SpringGradientWave'
+type IGradientTheme = 'gradient:aurora' | 'gradient:galaxy' | 'gradient:forest' | 'gradient:sakura' | 'gradient:lava'
+type IExtendedTheme = IThemeType | IGradientTheme
 
-const THEMES: { value: IThemeType; label: string }[] = [
-  { value: 'SpringGradientWave', label: '🌊 春日渐变' },
+const GRADIENT_CLASS_MAP: Record<IGradientTheme, string> = {
+  'gradient:aurora':  'bg-gradient-aurora',
+  'gradient:galaxy':  'bg-gradient-galaxy',
+  'gradient:forest':  'bg-gradient-forest',
+  'gradient:sakura':  'bg-gradient-sakura',
+  'gradient:lava':    'bg-gradient-lava',
+}
+
+const THEMES: { value: IExtendedTheme; label: string }[] = [
+  { value: 'SpringGradientWave',  label: '🌊 春日渐变' },
+  { value: 'gradient:aurora',     label: '🌅 极光晨曦' },
+  { value: 'gradient:galaxy',     label: '🌙 深海星空' },
+  { value: 'gradient:forest',     label: '🍃 翠绿森林' },
+  { value: 'gradient:sakura',     label: '🌸 樱花粉梦' },
+  { value: 'gradient:lava',       label: '🔥 熔岩日落' },
   { value: 'blue',   label: '🔵 蓝' },
   { value: 'pink',   label: '🌸 粉' },
   { value: 'purple', label: '🟣 紫' },
@@ -64,7 +79,7 @@ const defaultMd = `# 青狮海报大师 使用指南
 
 export default function Editor() {
   const [mdString, setMdString] = useState(defaultMd)
-  const [theme, setTheme] = useState<IThemeType>('SpringGradientWave')
+  const [theme, setTheme] = useState<IExtendedTheme>('SpringGradientWave')
   const [showThemePicker, setShowThemePicker] = useState(false)
   const [copyLoading, setCopyLoading] = useState(false)
   const [downloadLoading, setDownloadLoading] = useState(false)
@@ -256,7 +271,10 @@ export default function Editor() {
         {/* Right: Preview */}
         <div ref={previewRef} className="w-1/2 flex justify-center items-start px-4 py-4 bg-[#0d1117] overflow-auto">
           <div className="flex flex-col w-fit">
-            <Md2Poster theme={theme} copySuccessCallback={() => {}} ref={markdownRef}>
+            <Md2Poster
+              theme={theme in GRADIENT_CLASS_MAP ? 'SpringGradientWave' : theme as IThemeType}
+              className={theme in GRADIENT_CLASS_MAP ? GRADIENT_CLASS_MAP[theme as IGradientTheme] : undefined}
+              copySuccessCallback={() => {}} ref={markdownRef}>
               <Md2PosterContent articleClassName="prose prose-gray prose-img:rounded-lg prose-img:border prose-img:opacity-100 text-justify">{mdString}</Md2PosterContent>
               <Md2PosterFooter className='text-center'>
                 Powered by 青狮龙虾

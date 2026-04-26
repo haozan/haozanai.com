@@ -259,6 +259,28 @@
   .bg-brand-gradient {
     background: linear-gradient(135deg, #00E5CC, #00b4d8);
   }
+
+  /* ===== 自定义渐变主题背景 ===== */
+  /* 🌅 极光晨曦：橙→粉→紫 */
+  .bg-gradient-aurora {
+    background: linear-gradient(135deg, #f97316 0%, #ec4899 50%, #a855f7 100%) !important;
+  }
+  /* 🌙 深海星空：深蓝→紫→靛 */
+  .bg-gradient-galaxy {
+    background: linear-gradient(135deg, #0f172a 0%, #312e81 50%, #1e1b4b 100%) !important;
+  }
+  /* 🍃 翠绿森林：深绿→青绿→翠 */
+  .bg-gradient-forest {
+    background: linear-gradient(135deg, #14532d 0%, #059669 50%, #10b981 100%) !important;
+  }
+  /* 🌸 樱花粉梦：粉→玫瑰→浅紫 */
+  .bg-gradient-sakura {
+    background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 40%, #f9a8d4 70%, #e879f9 100%) !important;
+  }
+  /* 🔥 熔岩日落：橙红→深橙→金黄 */
+  .bg-gradient-lava {
+    background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 40%, #f97316 70%, #fbbf24 100%) !important;
+  }
   /* 电青渐变文字 */
   .text-brand-gradient {
     background: linear-gradient(135deg, #00E5CC, #00b4d8);
