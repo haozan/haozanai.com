@@ -19,7 +19,3 @@ example/node_modules/
 example/.next/
 example/.env*.local
 
-# 文档 & 杂项
-*.md
-LICENSE
-.storybook/

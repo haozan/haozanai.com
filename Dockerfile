@@ -1,14 +1,13 @@
 # syntax=docker/dockerfile:1
 # ── Stage 1: deps ──────────────────────────────────────────────
-FROM node:20-alpine AS deps
+FROM registry.cn-hangzhou.aliyuncs.com/library/node:20-alpine AS deps
 WORKDIR /app
 
-# 只复制 example/ 的依赖清单
-COPY example/package.json example/package-lock.json* ./
+COPY example/package.json example/package-lock.json ./
 RUN npm ci --prefer-offline
 
 # ── Stage 2: builder ───────────────────────────────────────────
-FROM node:20-alpine AS builder
+FROM registry.cn-hangzhou.aliyuncs.com/library/node:20-alpine AS builder
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
@@ -18,7 +17,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # ── Stage 3: runner ────────────────────────────────────────────
-FROM node:20-alpine AS runner
+FROM registry.cn-hangzhou.aliyuncs.com/library/node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -28,7 +27,6 @@ ENV PORT=3000
 RUN addgroup --system --gid 1001 nodejs \
  && adduser  --system --uid 1001 nextjs
 
-# standalone 模式的最小产物
 COPY --from=builder /app/public            ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static     ./.next/static
