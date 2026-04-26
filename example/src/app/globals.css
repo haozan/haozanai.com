@@ -81,6 +81,25 @@
   }
 }
 
+/* ── 海报内容区：修复有序列表对齐 ── */
+/* markdown-to-image 的 CSS reset 把 ol padding 清零，导致序号和文字不对齐 */
+.markdown-to-image-root article ol {
+  list-style: decimal;
+  padding-left: 1.625em;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+.markdown-to-image-root article ol li {
+  padding-left: 0.375em;
+}
+.markdown-to-image-root article ul {
+  list-style: disc;
+  padding-left: 1.625em;
+}
+.markdown-to-image-root article ul li {
+  padding-left: 0.375em;
+}
+
 /* ── 品牌工具类 ── */
 @layer utilities {
   /* 电青色纯色背景 */
