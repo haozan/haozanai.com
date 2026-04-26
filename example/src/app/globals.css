@@ -1,98 +1,121 @@
 @tailwind base;
-  @tailwind components;
-  @tailwind utilities;
+@tailwind components;
+@tailwind utilities;
 
-  @layer base {
-    :root {
-      --background: 0 0% 100%;
-      --foreground: 270 30% 8%;
+@layer base {
+  :root {
+    /* ── 底色 ── */
+    --background: 222 30% 6%;        /* #090d14 近黑 */
+    --foreground: 210 20% 90%;       /* 浅灰白主文字 */
 
-      --card: 0 0% 100%;
-      --card-foreground: 270 30% 8%;
+    --card: 220 22% 11%;             /* #131920 深灰卡片 */
+    --card-foreground: 210 20% 90%;
 
-      --popover: 0 0% 100%;
-      --popover-foreground: 270 30% 8%;
+    --popover: 220 22% 11%;
+    --popover-foreground: 210 20% 90%;
 
-      /* 主色 #8E2DE2 → hsl(272 76% 53%) */
-      --primary: 272 76% 53%;
-      --primary-foreground: 0 0% 100%;
+    /* ── 主色 Electric Cyan #00E5CC → hsl(174 100% 44%) ── */
+    --primary: 174 100% 44%;
+    --primary-foreground: 222 30% 6%;  /* 深底色，保证对比度 */
 
-      /* 辅助色 #4A00E0 → hsl(260 100% 44%) */
-      --secondary: 260 40% 94%;
-      --secondary-foreground: 260 100% 44%;
+    /* ── 辅助色 Muted Steel hsl(220 14% 55%) ── */
+    --secondary: 220 14% 16%;
+    --secondary-foreground: 220 14% 55%;
 
-      --muted: 270 20% 96%;
-      --muted-foreground: 270 10% 50%;
+    --muted: 220 14% 14%;
+    --muted-foreground: 220 14% 55%;
 
-      --accent: 272 60% 92%;
-      --accent-foreground: 272 76% 40%;
+    --accent: 174 60% 14%;           /* 电青色低饱和暗底 */
+    --accent-foreground: 174 100% 60%;
 
-      --destructive: 0 84.2% 60.2%;
-      --destructive-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
 
-      --border: 270 20% 88%;
-      --input: 270 20% 88%;
-      --ring: 272 76% 53%;
+    --border: 220 14% 20%;
+    --input: 220 14% 20%;
+    --ring: 174 100% 44%;
 
-      --radius: 0.5rem;
+    --radius: 0.5rem;
 
-      /* 品牌渐变 */
-      --gradient-from: #8E2DE2;
-      --gradient-to: #4A00E0;
-    }
+    /* ── 品牌色变量 ── */
+    --brand-cyan: #00E5CC;
+    --brand-steel: hsl(220, 14%, 55%);
+    --brand-bg: #090d14;
+    --brand-card: #131920;
 
-    .dark {
-      --background: 270 30% 6%;
-      --foreground: 270 20% 96%;
-
-      --card: 270 30% 8%;
-      --card-foreground: 270 20% 96%;
-
-      --popover: 270 30% 8%;
-      --popover-foreground: 270 20% 96%;
-
-      --primary: 272 76% 63%;
-      --primary-foreground: 0 0% 100%;
-
-      --secondary: 260 30% 18%;
-      --secondary-foreground: 270 20% 96%;
-
-      --muted: 260 20% 16%;
-      --muted-foreground: 270 10% 60%;
-
-      --accent: 260 30% 20%;
-      --accent-foreground: 272 76% 70%;
-
-      --destructive: 0 62.8% 40%;
-      --destructive-foreground: 0 0% 100%;
-
-      --border: 260 20% 20%;
-      --input: 260 20% 20%;
-      --ring: 272 76% 63%;
-    }
+    /* 主色发光效果 */
+    --glow-cyan: 0 0 20px rgba(0, 229, 204, 0.35);
   }
 
-  @layer base {
-    * {
-      @apply border-border;
-    }
-    body {
-      @apply bg-background text-foreground;
-    }
+  /* dark 直接复用 :root（本身就是暗色系） */
+  .dark {
+    --background: 222 30% 6%;
+    --foreground: 210 20% 90%;
+    --card: 220 22% 11%;
+    --card-foreground: 210 20% 90%;
+    --popover: 220 22% 11%;
+    --popover-foreground: 210 20% 90%;
+    --primary: 174 100% 44%;
+    --primary-foreground: 222 30% 6%;
+    --secondary: 220 14% 16%;
+    --secondary-foreground: 220 14% 55%;
+    --muted: 220 14% 14%;
+    --muted-foreground: 220 14% 55%;
+    --accent: 174 60% 14%;
+    --accent-foreground: 174 100% 60%;
+    --destructive: 0 62.8% 40%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 14% 20%;
+    --input: 220 14% 20%;
+    --ring: 174 100% 44%;
   }
+}
 
-  /* 品牌渐变工具类 */
-  @layer utilities {
-    .bg-brand-gradient {
-      background: linear-gradient(135deg, var(--gradient-from), var(--gradient-to));
-    }
-    .text-brand-gradient {
-      background: linear-gradient(135deg, var(--gradient-from), var(--gradient-to));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .border-brand {
-      border-color: hsl(var(--primary));
-    }
+@layer base {
+  * {
+    @apply border-border;
   }
+  body {
+    @apply bg-background text-foreground;
+    background-color: #090d14;
+  }
+}
+
+/* ── 品牌工具类 ── */
+@layer utilities {
+  /* 电青色纯色背景 */
+  .bg-brand {
+    background-color: var(--brand-cyan);
+  }
+  /* 电青色文字 */
+  .text-brand {
+    color: var(--brand-cyan);
+  }
+  /* 电青色发光边框 */
+  .border-brand {
+    border-color: var(--brand-cyan);
+  }
+  /* 电青色 glow 阴影 */
+  .glow-brand {
+    box-shadow: var(--glow-cyan);
+  }
+  /* 电青色渐变（从左到右稍微偏绿到青） */
+  .bg-brand-gradient {
+    background: linear-gradient(135deg, #00E5CC, #00b4d8);
+  }
+  /* 电青渐变文字 */
+  .text-brand-gradient {
+    background: linear-gradient(135deg, #00E5CC, #00b4d8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  /* 钢灰次级文字 */
+  .text-steel {
+    color: hsl(220, 14%, 55%);
+  }
+  /* 卡片背景 */
+  .bg-card-dark {
+    background-color: var(--brand-card);
+  }
+}

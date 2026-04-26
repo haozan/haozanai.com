@@ -5,14 +5,13 @@ import { Button } from './ui/button'
 import { Md2PosterContent, Md2Poster, Md2PosterHeader, Md2PosterFooter } from 'markdown-to-image'
 import { Copy, LoaderCircle } from 'lucide-react';
 
-
 const Textarea: React.FC<TextareaHTMLAttributes<HTMLTextAreaElement>> = ({ onChange, ...rest }) => {
   return (
     <textarea
-      className="border-none bg-purple-50/60 p-8 w-full resize-none h-full min-h-screen
-      focus-visible:outline-none focus-visible:ring-0 focus-visible:border-0
-      text-[#4A00E0]/70 hover:text-[#4A00E0] focus:text-[#4A00E0] font-light font-inter
-      "
+      className="border-none bg-[#131920] p-8 w-full resize-none h-full min-h-screen
+        focus-visible:outline-none focus-visible:ring-0 focus-visible:border-0
+        text-[hsl(220,14%,65%)] hover:text-[hsl(220,14%,80%)] focus:text-[hsl(210,20%,90%)]
+        placeholder:text-[hsl(220,14%,35%)] font-light font-mono transition-colors"
       {...rest}
       onChange={(e) => onChange?.(e)}
     />
@@ -39,7 +38,7 @@ export default function Editor() {
   const [copyLoading, setCopyLoading] = useState(false)
   const handleCopyFromChild = () => {
     setCopyLoading(true)
-    markdownRef?.current?.handleCopy().then(res => {
+    markdownRef?.current?.handleCopy().then(() => {
       setCopyLoading(false)
       alert('Copy Success!')
     }).catch(err => {
@@ -47,20 +46,19 @@ export default function Editor() {
       console.log('err copying from child', err)
     })
   }
-  const copySuccessCallback = () => {
-    console.log('copySuccessCallback')
-  }
+
   return (
-    <ScrollArea className="h-[96vh] w-full border-2 border-[#8E2DE2]/30 rounded-xl my-4 relative">
-      <div className="flex flex-row h-full ">
-        <div className="w-1/2">
-          {/* Edit */}
+    <ScrollArea className="h-[96vh] w-full border border-[#00E5CC]/20 rounded-xl my-4 relative bg-[#090d14] shadow-glow-cyan">
+      <div className="flex flex-row h-full">
+        {/* Left: Editor */}
+        <div className="w-1/2 border-r border-[#00E5CC]/10">
           <Textarea placeholder="markdown" onChange={handleChange} defaultValue={mdString} />
         </div>
-        <div className="w-1/2 mx-auto flex justify-center p-4 ">
-          {/* Preview */}
+
+        {/* Right: Preview */}
+        <div className="w-1/2 mx-auto flex justify-center p-4 bg-[#0d1117]">
           <div className="flex flex-col w-fit">
-            <Md2Poster theme="SpringGradientWave" copySuccessCallback={copySuccessCallback} ref={markdownRef}>
+            <Md2Poster theme="SpringGradientWave" copySuccessCallback={() => {}} ref={markdownRef}>
               <Md2PosterHeader className="flex justify-center items-center px-4 font-medium text-lg">
                 <span>{new Date().toISOString().slice(0, 10)}</span>
               </Md2PosterHeader>
@@ -73,10 +71,17 @@ export default function Editor() {
           </div>
         </div>
       </div>
+
+      {/* Copy button */}
       <div className="absolute top-4 right-4 flex flex-row gap-2 opacity-80 hover:opacity-100 transition-all">
-        <Button className=" rounded-xl" onClick={handleCopyFromChild} {...copyLoading ? { disabled: true } : {}}>
-          {copyLoading ?
-            <LoaderCircle className="w-4 h-4 mr-1 animate-spin" />
+        <Button
+          className="rounded-xl bg-[#00E5CC] text-[#090d14] font-semibold
+            hover:bg-[#00E5CC]/90 shadow-glow-cyan border-0"
+          onClick={handleCopyFromChild}
+          disabled={copyLoading}
+        >
+          {copyLoading
+            ? <LoaderCircle className="w-4 h-4 mr-1 animate-spin" />
             : <Copy className="w-4 h-4 mr-1" />}
           Copy Image
         </Button>
