@@ -7,7 +7,7 @@ import { Md2PosterContent, Md2Poster, Md2PosterFooter } from 'markdown-to-image'
 import { Copy, LoaderCircle, Download, Palette, ImageUp } from 'lucide-react'
 import { domToPng } from 'modern-screenshot'
 
-type IThemeType = 'blue' | 'pink' | 'purple' | 'green' | 'yellow' | 'gray' | 'red' | 'indigo' | 'SpringGradientWave'
+type IThemeType = 'SpringGradientWave'
 type IGradientTheme = 'gradient:aurora' | 'gradient:galaxy' | 'gradient:forest' | 'gradient:sakura' | 'gradient:lava'
 type IExtendedTheme = IThemeType | IGradientTheme
 
@@ -19,18 +19,6 @@ const GRADIENT_CLASS_MAP: Record<IGradientTheme, string> = {
   'gradient:lava':    'bg-gradient-lava',
 }
 
-// 纯色主题的增强渐变覆盖（替换库内置的单调渐变）
-const SOLID_OVERRIDE_MAP: Partial<Record<IThemeType, string>> = {
-  blue:   'bg-override-blue',
-  pink:   'bg-override-pink',
-  purple: 'bg-override-purple',
-  green:  'bg-override-green',
-  yellow: 'bg-override-yellow',
-  gray:   'bg-override-gray',
-  red:    'bg-override-red',
-  indigo: 'bg-override-indigo',
-}
-
 const THEMES: { value: IExtendedTheme; label: string }[] = [
   { value: 'SpringGradientWave',  label: '🌊 春日渐变' },
   { value: 'gradient:aurora',     label: '🌅 极光晨曦' },
@@ -38,14 +26,6 @@ const THEMES: { value: IExtendedTheme; label: string }[] = [
   { value: 'gradient:forest',     label: '🍃 翠绿森林' },
   { value: 'gradient:sakura',     label: '🌸 樱花粉梦' },
   { value: 'gradient:lava',       label: '🔥 熔岩日落' },
-  { value: 'blue',   label: '🔵 蓝' },
-  { value: 'pink',   label: '🌸 粉' },
-  { value: 'purple', label: '🟣 紫' },
-  { value: 'green',  label: '🟢 绿' },
-  { value: 'yellow', label: '🟡 黄' },
-  { value: 'gray',   label: '⚪ 灰' },
-  { value: 'red',    label: '🔴 红' },
-  { value: 'indigo', label: '🌌 靛蓝' },
 ]
 
 const defaultMd = `# 青狮海报大师 使用指南
@@ -284,11 +264,11 @@ export default function Editor() {
         <div ref={previewRef} className="w-1/2 flex justify-center items-start px-4 py-4 bg-[#0d1117] overflow-auto">
           <div className="flex flex-col w-fit">
             <Md2Poster
-              theme={theme in GRADIENT_CLASS_MAP ? 'SpringGradientWave' : theme as IThemeType}
+              theme={'SpringGradientWave'}
               className={
                 theme in GRADIENT_CLASS_MAP
                   ? GRADIENT_CLASS_MAP[theme as IGradientTheme]
-                  : SOLID_OVERRIDE_MAP[theme as IThemeType]
+                  : undefined
               }
               copySuccessCallback={() => {}} ref={markdownRef}>
               <Md2PosterContent articleClassName="prose prose-gray prose-img:rounded-lg prose-img:border prose-img:opacity-100 text-justify">{mdString}</Md2PosterContent>
