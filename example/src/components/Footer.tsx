@@ -7,12 +7,12 @@ export default function Footer() {
          bg-[#090d14] text-steel backdrop-blur-2xl font-mono text-sm px-4 lg:px-0"
     >
       <p className="px-6 py-3 rounded-full flex justify-center items-center gap-2">
-        <span className="text-[hsl(220,14%,55%)]">© 2024</span>
+        <span className="text-[hsl(220,14%,55%)]">© 2025 青狮海报大师</span>
         <Link
-          href="https://github.com/gcui-art/markdown-to-image/"
+          href="https://haozanai.com"
           className="text-[hsl(220,14%,55%)] hover:text-[#00E5CC] transition-colors duration-200"
         >
-          gcui-art/markdown-to-image
+          haozanai.com
         </Link>
       </p>
     </footer>

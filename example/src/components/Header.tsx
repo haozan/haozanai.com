@@ -13,7 +13,7 @@ export default function Header() {
           <Link href="/" className="flex items-center gap-2 group">
             <Image src="/logo.png" alt="QingClaw logo" width={28} height={28} />
             <span className="text-brand-gradient font-bold tracking-tight">
-              markdown-to-image
+              青狮海报大师
             </span>
           </Link>
         </div>
