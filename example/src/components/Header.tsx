@@ -9,8 +9,10 @@ export default function Header() {
     >
       <div className="max-w-6xl flex w-full items-center justify-between">
         <div className="font-medium text-xl flex items-center gap-2">
-          {/* <div>logo</div> */}
-          <Link href="/" className="text-brand-gradient font-bold">markdown-to-image</Link>
+          <Link href="/" className="flex items-center gap-2">
+            <Image src="/logo.png" alt="haozanai logo" width={28} height={28} className="rounded-md" />
+            <span className="text-brand-gradient font-bold">markdown-to-image</span>
+          </Link>
         </div>
         <div className="flex items-center justify-center gap-1 text-sm font-light text-[#4A00E0]/90">
           <p
