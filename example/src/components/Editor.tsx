@@ -114,13 +114,13 @@ export default function Editor() {
     })
   }
 
-  // 上传图片到 img.scdn.io
+  // 上传图片到本地服务器（/api/upload），用完即删，无需第三方图床
   const handleUploadImage = async (file: File) => {
     setUploadLoading(true)
     try {
       const formData = new FormData()
       formData.append('image', file)
-      const res = await fetch('https://img.scdn.io/api/v1.php', {
+      const res = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
       })
