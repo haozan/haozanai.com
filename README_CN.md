@@ -1,67 +1,67 @@
-# Markdown To Image / Markdown Poster
+# Markdown To Poster
 
-This React component renders Markdown as visually appealing social media images. The project also includes a built-in web editor that can be used as an online Markdown-to-poster editor with a simple one-click deployment.
+这个 React 组件用于将 Markdown 渲染为漂亮的社交媒体图片。此外，该项目还包括一个内置的 WEB Editor，一键部署后，可以当做 Markdown 转海报图片在线编辑器使用。
 
-![markdown-to-image banner](https://github.com/user-attachments/assets/ef06f52d-ebef-4854-81b2-5b96cdfb75bf)
+![markdown-to-image banner](https://github.com/gcui-art/markdown-to-image/blob/main/public/banner.jpg)
 
 - [English](./README.md) | [中文](./README_CN.md)
-- [DEMO & Web Editor](https://readpo.com/en/poster)
+- [DEMO & WEB Editor](https://readpo.com/zh/poster)
 - [Deploy Editor with Vercel](https://vercel.com/new/clone?repository-url=https://github.com/gcui-art/markdown-to-image&root-directory=example&project-name=markdown-to-image&repository-name=markdown-to-image)
 - [NPM:markdown-to-image](https://www.npmjs.com/package/markdown-to-image)
 
-⭐ Click the Star and Watch buttons to stay updated on our latest developments.
+⭐ 点击 Star 和 Watch 按钮，跟踪我们的最新进展。
 
-## Features
+## 功能
 
-- [x] Render Markdown as poster images optimized for social sharing
-- [x] One built-in templates with support for custom templates
-- [x] Customizable themes with 9 pre-built options
-- [x] Copy output as an image
-- [x] One-click deployment to platforms like Vercel
-- [x] Integrated image CORS proxy for easy insertion of online images into posters
-- [x] Copy output as HTML code for pasting into emails and editors
-- [ ] More built-in templates
+- [x] 将 Markdown 渲染为适合社交分享的海报图片
+- [x] 内置一个模板，支持模板扩展
+- [x] 支持自定义主题，并且已内置9个主题
+- [x] 支持复制为图像
+- [x] 支持一键部署到 Vercel 等
+- [x] 已集成图片跨域代理，可以方便的插入在线图片生成图文海报
+- [x] 支持复制为HTML 代码，可粘贴到电子邮件和一些编辑器中
+- [ ] 更多内置模板
 
-## Getting Started
+## 如何使用
 
-There are two ways to use markdown-to-poster:
+有两种使用 markdown-to-image 的方式：
 
-1. Integration: markdown-to-poster is exported as a React component that can be seamlessly integrated into your projects.
-2. Using Web Editor: The example path includes a web editor that can be deployed and used as an online editor.
+- 在项目中集成：markdown-to-image 已导出为一个 React 组件，可以直接集成到您自己的项目中。
+- 使用WEB UI：example路径中自带了一个 WEB Editor，部署后，可以当做在线编辑器使用。
 
-### Integration
+### 在你的项目中集成
 
-`markdown-to-poster` exports a component called Md2Poster and three subcomponents, which can be installed via npm or other package managers.
+`markdown-to-image`导出了一个叫 Md2Poster 的组件以及其他三个子组件，你可以通过 npm 等安装使用。
 
-#### Installation
+#### 安装
 
-Install with npm:
+用 npm 安装：
 
 ```bash
 npm i markdown-to-image
 ```
 
-Install with pnpm:
+用 pnpm 安装：
 
 ```bash
 pnpm install markdown-to-image
 ```
 
-yarn add markdown-to-image:
+用 yarn 安装：
 
 ```bash
-yarn add markdown-to-image
+yarn install markdown-to-image
 ```
 
-#### Usage
+#### 使用
 
-Basic example:
+简单开始：
 
 ```javascript
 import 'markdown-to-image/dist/style.css'
 import { Md2Poster, Md2PosterContent, Md2PosterHeader, Md2PosterFooter } from 'markdown-to-image'
 
-// ...
+...
 
 const markdown = `
 # AI Morning Updates
@@ -69,55 +69,59 @@ const markdown = `
 ...
 `
 
-// ...
+...
 
 return (
-  // ...
-  <Md2Poster>
-    <Md2PosterHeader>Poster Header</Md2PosterHeader>
-    <Md2PosterContent>{markdown}</Md2PosterContent>
-    <Md2PosterFooter>Powered by ReadPo.com</Md2PosterFooter>
-  </Md2Poster>
-  // ...
+
+...
+
+<Md2Poster>
+  <Md2PosterHeader>Poster Header</Md2PosterHeader>
+  <Md2PosterContent>{markdown}</Md2PosterContent>
+  <Md2PosterFooter>Powered by ReadPo.com</Md2PosterFooter>
+</Md2Poster>
+
+...
+
 )
 ```
 
-### Using the Web Editor
+### 使用在线编辑器
 
-#### Official Web Editor
+#### 使用官方部署的在线编辑器
 
-👉 Visit: [readpo.com](https://readpo.com/en/poster)
+👉 访问：[ReadPo.com](https://readpo.com/zh/poster)
 
-#### Deploying Your Own Web Editor
+#### 部署自己的在线编辑器
 
-[Deploy Editor with Vercel](https://vercel.com/new/clone?repository-url=https://github.com/gcui-art/markdown-to-image&root-directory=example&project-name=markdown-to-image&repository-name=markdown-to-image)
+这里使用Vercel进行部署，点击后一键部署：[部署 Editor 到 Vercel](https://vercel.com/new/clone?repository-url=https://github.com/gcui-art/markdown-to-image&root-directory=example&project-name=markdown-to-image&repository-name=markdown-to-image)
 
-## Contributing
+## 贡献指南
 
-There are four ways you can support this project:
+您有四种方式支持本项目：
 
-1. Fork and Submit Pull Requests: We welcome any PRs that enhance the component or editor.
-2. Open Issues: We appreciate reasonable suggestions and bug reports.
-3. Donate: If this project has helped you, consider buying us a coffee using the Sponsor button at the top of the project. Cheers! ☕
-4. Spread the Word: Recommend this project to others, star the repo, or add a backlink after using the project.
+1. **Fork 项目并提交 PR**：我们欢迎任何让这个组件和Editor变的更好的PR。
+2. **提交Issue**：我们欢迎任何合理的建议、bug反馈。
+3. **捐赠**：在项目的顶部我们放置了 Sponsor 按钮，如果这个项目帮助到了您，你可以请我们喝一杯，干杯☕。
+4. **推荐**：向其他人推荐本项目；点击Star；使用本项目后放置外链。
 
-## License
+## 许可证
 
-This project is licensed under the permissive Apache 2.0 open source license.
+使用非常宽松的 Apache 2.0开源协议。
 
-## Questions, Suggestions, Issues, or Bugs?
+## 你有一个问题/建议/困难/Bug？
 
-We use GitHub Issues to manage feedback. Feel free to open an issue, and we'll address it promptly.
+我们使用Github的Issue来管理这些反馈，你可以提交一个。我们会经常来处理。
 
-## Related Links
+## 相关链接
 
-- Our other open source projects: [Suno AI API](https://github.com/gcui-art/suno-api)
-- Demo site: [https://readpo.com/poster](https://readpo.com/en/poster)
-- NPM Package: [npm:markdown-to-image](https://www.npmjs.com/package/markdown-to-image)
+- 我们的其他开源项目: [Suno AI API](https://github.com/gcui-art/suno-api)
+- 演示站点: [https://readpo.com](https://readpo.com/zh/poster)
+- NPM Package：[npm:markdown-to-image](https://www.npmjs.com/package/markdown-to-image)
 
-## FQA
+## 常见问题
 
-1. When utilizing frameworks like Next.js for server-side rendering (SSR), you may encounter the error `ReferenceError: document is not defined`. To address this issue, you can employ dynamic components with `next/dynamic`.
+1. 在Nextjs这样的SSR框架中使用的时候，可能会遇到`ReferenceError: document is not defined`报错，你可以使用`next/dynamic`动态组件解决这个问题。
 
 ```javascript
 // page.ts
