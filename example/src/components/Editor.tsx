@@ -31,7 +31,7 @@ const defaultMd = `# 青狮海报大师 使用指南
 
 1. 在左侧编辑器中输入或粘贴 Markdown 内容
 2. 右侧实时预览海报效果
-3. 如需插入图片，点击左上角「**上传图片**」按钮
+3. 如需插入图片，点击左上角「**插入图片**」按钮
 4. 选择合适的「**主题**」风格
 5. 点击「**下载**」保存为 PNG 图片，或「**复制图片**」直接粘贴使用
 
@@ -205,7 +205,7 @@ export default function Editor() {
               {uploadLoading
                 ? <LoaderCircle className="w-3.5 h-3.5 animate-spin" />
                 : <ImageUp className="w-3.5 h-3.5" />}
-              {uploadLoading ? '上传中...' : '上传图片'}
+              {uploadLoading ? '上传中...' : '插入图片'}
             </button>
             <span className="text-[hsl(220,14%,30%)] text-xs">支持 JPG / PNG / GIF · 自动插入光标</span>
           </div>
