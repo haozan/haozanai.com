@@ -81,23 +81,147 @@
   }
 }
 
-/* ── 海报内容区：修复有序列表对齐 ── */
-/* markdown-to-image 的 CSS reset 把 ol padding 清零，导致序号和文字不对齐 */
-.markdown-to-image-root article ol {
-  list-style: decimal;
-  padding-left: 1.625em;
+/* ── 海报内容区：去除圆角，改为直角 ── */
+.markdown-to-image-root > div,
+.markdown-to-image-root > div > div {
+  border-radius: 0 !important;
+}
+
+/* ── 海报内容区：加宽 ── */
+.markdown-to-image-root > div {
+  max-width: 560px !important;
+  width: 560px !important;
+}
+
+/* ── 海报内容区：修复排版错位（markdown-to-image CSS reset 清零了大量样式） ── */
+
+/* 标题层级 */
+.markdown-to-image-root article h1 {
+  font-size: 1.75em;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+.markdown-to-image-root article h2 {
+  font-size: 1.35em;
+  font-weight: 700;
+  margin-top: 1em;
+  margin-bottom: 0.4em;
+  line-height: 1.35;
+}
+.markdown-to-image-root article h3 {
+  font-size: 1.1em;
+  font-weight: 600;
+  margin-top: 0.8em;
+  margin-bottom: 0.3em;
+  line-height: 1.4;
+}
+
+/* 段落间距 */
+.markdown-to-image-root article p {
+  margin-top: 0.4em;
+  margin-bottom: 0.4em;
+  line-height: 1.7;
+}
+
+/* 有序 / 无序列表 — 完全自定义 marker，避免 outside/inside 位置问题 */
+.markdown-to-image-root article ol,
+.markdown-to-image-root article ul {
+  list-style: none !important;
+  padding-left: 0 !important;
+  padding-inline-start: 0 !important;
   margin-top: 0.5em;
   margin-bottom: 0.5em;
 }
-.markdown-to-image-root article ol li {
-  padding-left: 0.375em;
+.markdown-to-image-root article li {
+  position: relative;
+  padding-left: 1.6em;
+  margin-bottom: 0.3em;
 }
-.markdown-to-image-root article ul {
-  list-style: disc;
-  padding-left: 1.625em;
+/* 无序列表：手动画 disc bullet */
+.markdown-to-image-root article ul > li::before {
+  content: "•";
+  position: absolute;
+  left: 0.3em;
+  top: 0;
+  font-size: 1em;
+  line-height: inherit;
+  color: inherit;
 }
-.markdown-to-image-root article ul li {
-  padding-left: 0.375em;
+/* 有序列表：用 CSS counter 画序号 */
+.markdown-to-image-root article ol {
+  counter-reset: li-counter;
+}
+.markdown-to-image-root article ol > li {
+  counter-increment: li-counter;
+}
+.markdown-to-image-root article ol > li::before {
+  content: counter(li-counter) ".";
+  position: absolute;
+  left: 0;
+  top: 0;
+  min-width: 1.4em;
+  text-align: left;
+  font-size: 1em;
+  line-height: inherit;
+  color: inherit;
+}
+/* marker 禁用（避免双重显示） */
+.markdown-to-image-root article ol li::marker,
+.markdown-to-image-root article ul li::marker {
+  content: none !important;
+  font-size: 0;
+}
+
+/* 引用块 blockquote */
+/* ⚠️ 不用 border-left，用 ::before 伪元素画左边线 */
+/* ⚠️ 不用 flex（html2canvas flex 支持有限），不用 min-height（会撑大高度） */
+/* 高度完全由内容 + padding 决定，::before 高度跟随父元素自然撑开 */
+.markdown-to-image-root article blockquote {
+  position: relative;
+  display: block !important;
+  border: none !important;
+  border-left: none !important;
+  border-inline-start: none !important;
+  padding-top: 0.6em;
+  padding-bottom: 0.6em;
+  padding-right: 1em;
+  padding-left: 1.2em;
+  margin: 0.75em 0;
+  background: rgba(0, 229, 204, 0.06);
+  color: inherit;
+  font-style: normal !important;
+  border-radius: 0 4px 4px 0;
+  quotes: none !important;
+  text-align: left !important;
+  overflow: visible;
+}
+/* 左边线：用 border-left 直接画在 blockquote 上，inline style 在 handleDownload 里固化 */
+.markdown-to-image-root article blockquote {
+  border-left: 4px solid #00E5CC !important;
+}
+/* prose 自动给 blockquote 首尾段落加 open/close-quote，去掉 */
+.markdown-to-image-root article blockquote p:first-of-type::before,
+.markdown-to-image-root article blockquote p:last-of-type::after {
+  content: none !important;
+  quotes: none;
+}
+.markdown-to-image-root article blockquote p {
+  text-align: left !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* 表格 th / td */
+.markdown-to-image-root article th {
+  padding: 0.5em 0.75em;
+  text-align: left;
+  border-bottom: 2px solid rgba(0,0,0,0.12);
+}
+.markdown-to-image-root article td {
+  padding: 0.5em 0.75em;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
 }
 
 /* ── 品牌工具类 ── */

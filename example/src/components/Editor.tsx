@@ -3,8 +3,8 @@ import React, { useState, ChangeEvent, useRef } from 'react'
 import '@/styles/markdown-to-image-slim.css'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from './ui/button'
-import { Md2PosterContent, Md2Poster, Md2PosterHeader, Md2PosterFooter } from 'markdown-to-image'
-import { Copy, LoaderCircle, Download, Palette, Monitor, Smartphone, ImageUp } from 'lucide-react';
+import { Md2PosterContent, Md2Poster, Md2PosterFooter } from 'markdown-to-image'
+import { Copy, LoaderCircle, Download, Palette, ImageUp } from 'lucide-react';
 
 type IThemeType = 'blue' | 'pink' | 'purple' | 'green' | 'yellow' | 'gray' | 'red' | 'indigo' | 'SpringGradientWave'
 
@@ -68,7 +68,6 @@ export default function Editor() {
   const [copyLoading, setCopyLoading] = useState(false)
   const [downloadLoading, setDownloadLoading] = useState(false)
   const [uploadLoading, setUploadLoading] = useState(false)
-  const [sizeMode, setSizeMode] = useState<'desktop' | 'mobile'>('mobile')
   const markdownRef = useRef<any>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -141,19 +140,191 @@ export default function Editor() {
       alert('下载失败，找不到海报元素')
       return
     }
+
+    // html2canvas 不能正确处理 CSS logical properties（padding-inline-start 等）
+    // 捕获前把所有 blockquote 强制设为物理属性的 inline style，捕获后还原
+    const blockquotes = Array.from(posterEl.querySelectorAll('blockquote')) as HTMLElement[]
+    const savedStyles = blockquotes.map(bq => bq.getAttribute('style') || '')
+
+    // ⚠️ markdown 解析器 bug：表格末行 | 后紧跟 blockquote 时，会多出一个 <p>内容为行号</p>
+    // 捕获前把 blockquote 内 innerText 为纯数字或空白的多余 p 元素隐藏，捕获后还原
+    type RemovedP = { p: HTMLElement; parent: HTMLElement; nextSibling: Node | null }
+    const removedPs: RemovedP[] = []
+    blockquotes.forEach(bq => {
+      const ps = Array.from(bq.querySelectorAll('p')) as HTMLElement[]
+      ps.forEach(p => {
+        const text = p.innerText.trim()
+        // 纯数字 or 空字符串 → 是多余的 p
+        if (/^\d*$/.test(text)) {
+          removedPs.push({ p, parent: p.parentElement as HTMLElement, nextSibling: p.nextSibling })
+          p.remove()
+        }
+      })
+    })
+
+    // html2canvas 对 blockquote 渲染存在两类差异：
+    // 1. CSS logical properties (border-inline-start 等) 不认
+    // 2. CSS !important 优先级反噬 inline 普通样式
+    // 解决：所有 blockquote 和内部 p 的样式全部固化为 inline px + !important，
+    //       同时注入临时 style 标签彻底消灭 ::before/::after 伪元素干扰
+    // html2canvas 对 blockquote 渲染存在两类差异：
+    // 1. CSS logical properties (border-inline-start 等) 不认
+    // 2. CSS !important 优先级反噬 inline 普通样式
+    // 解决：所有 blockquote 和内部 p 的样式全部固化为 inline px + !important
+    type SavedP = { el: HTMLElement; style: string }
+    const savedPs: SavedP[] = []
+    // 注入临时 style 标签，绕过 CSS 优先级和 html2canvas 渲染差异
+    const overrideId = '__h2c_blockquote_override__'
+    let overrideStyle = document.getElementById(overrideId)
+    if (!overrideStyle) {
+      overrideStyle = document.createElement('style')
+      overrideStyle.id = overrideId
+      document.head.appendChild(overrideStyle)
+    }
+    const overrideRules: string[] = []
+
+    blockquotes.forEach(bq => {
+      const cs = window.getComputedStyle(bq)
+      // 先清掉所有 logical padding/margin（无 !important），再设物理属性，确保物理属性生效
+      // ⚠️ 绝不能加 'important'：inline !important 优先级最高，会把后面设的物理属性覆盖掉
+      bq.style.removeProperty('padding-inline-start')
+      bq.style.removeProperty('padding-inline-end')
+      bq.style.removeProperty('padding-block-start')
+      bq.style.removeProperty('padding-block-end')
+      bq.style.removeProperty('margin-block-start')
+      bq.style.removeProperty('margin-block-end')
+
+      // ── 处理内部 p 元素的样式 ──
+      const pEls = Array.from(bq.querySelectorAll('p')) as HTMLElement[]
+      pEls.forEach(p => {
+        const pCs = window.getComputedStyle(p)
+        savedPs.push({ el: p, style: p.getAttribute('style') || '' })
+        p.style.setProperty('line-height', pCs.lineHeight, 'important')
+        p.style.setProperty('margin-top', pCs.marginTop, 'important')
+        p.style.setProperty('margin-bottom', pCs.marginBottom, 'important')
+        p.style.setProperty('font-size', pCs.fontSize, 'important')
+        // html2canvas 将文字渲染在行盒底部，浏览器用 half-leading 居中
+        const lineH = parseFloat(pCs.lineHeight)
+        const fontS = parseFloat(pCs.fontSize)
+        const halfLeading = (lineH - fontS) / 2
+        p.style.setProperty('transform', `translateY(-${halfLeading.toFixed(1)}px)`, 'important')
+      })
+
+      // 固化物理 padding（!important 防 CSS 回冲）
+      bq.style.setProperty('padding-left', cs.paddingLeft, 'important')
+      bq.style.setProperty('padding-right', cs.paddingRight, 'important')
+      bq.style.setProperty('padding-top', cs.paddingTop, 'important')
+      bq.style.setProperty('padding-bottom', cs.paddingBottom, 'important')
+
+      // 固化四边 border（inline !important 覆盖 CSS border-inline-start:none !important）
+      bq.style.setProperty('border-top-width', '0px', 'important')
+      bq.style.setProperty('border-top-style', 'none', 'important')
+      bq.style.setProperty('border-right-width', '0px', 'important')
+      bq.style.setProperty('border-right-style', 'none', 'important')
+      bq.style.setProperty('border-bottom-width', '0px', 'important')
+      bq.style.setProperty('border-bottom-style', 'none', 'important')
+      bq.style.setProperty('border-left-width', cs.borderLeftWidth, 'important')
+      bq.style.setProperty('border-left-color', cs.borderLeftColor, 'important')
+      bq.style.setProperty('border-left-style', cs.borderLeftStyle, 'important')
+
+      // 固化 margin + overflow + background + border-radius
+      bq.style.setProperty('margin-top', cs.marginTop, 'important')
+      bq.style.setProperty('margin-bottom', cs.marginBottom, 'important')
+      bq.style.setProperty('margin-left', cs.marginLeft, 'important')
+      bq.style.setProperty('margin-right', cs.marginRight, 'important')
+      bq.style.setProperty('overflow', 'hidden', 'important')
+      bq.style.setProperty('background-color', cs.backgroundColor, 'important')
+      bq.style.setProperty('border-radius', cs.borderRadius, 'important')
+
+      // 额外：强制覆盖 blockquote p::before/::after，防 html2canvas 误渲染引号伪元素
+      const selector = `.markdown-to-image-root article blockquote:nth-of-type(${blockquotes.indexOf(bq) + 1})`
+      overrideRules.push(`
+        ${selector} p::before,
+        ${selector} p::after {
+          content: none !important;
+          display: none !important;
+        }
+      `)
+    })
+
+    // 写入临时 style 标签
+    overrideStyle.textContent = overrideRules.join('\n')
+    console.log('[blockquote export] override style injected', overrideRules.length, 'rules')
+
+    // 诊断日志：打印 blockquote 和内部 p 的关键 computed 值
+    blockquotes.forEach((bq, i) => {
+      const cs = window.getComputedStyle(bq)
+      const pEls = Array.from(bq.querySelectorAll('p')) as HTMLElement[]
+      const pCs = pEls.length > 0 ? window.getComputedStyle(pEls[0]) : null
+      console.log(`[blockquote export] bq#${i}:`, {
+        offsetTop: bq.offsetTop,
+        p_count: pEls.length,
+        bq_padding: `t=${cs.paddingTop} r=${cs.paddingRight} b=${cs.paddingBottom} l=${cs.paddingLeft}`,
+        bq_margin: `t=${cs.marginTop} b=${cs.marginBottom} l=${cs.marginLeft} r=${cs.marginRight}`,
+        bq_borderLeft: cs.borderLeftWidth,
+        bq_overflow: cs.overflow,
+        bq_background: cs.backgroundColor,
+        bq_borderRadius: cs.borderRadius,
+        p_lineHeight: pCs?.lineHeight,
+        p_fontSize: pCs?.fontSize,
+        p_margin: `t=${pCs?.marginTop} b=${pCs?.marginBottom}`,
+      })
+    })
+
+    // 捕获前强制 poster 背景色，防边缘透白
+    const posterOrigBg = posterEl.style.backgroundColor
+    posterEl.style.backgroundColor = '#090d14'
+
     import('html2canvas').then(({ default: html2canvas }) => {
       html2canvas(posterEl, { useCORS: true, scale: 2 }).then(canvas => {
+        // 还原 poster 背景
+        posterEl.style.backgroundColor = posterOrigBg
+        // 还原被删除的多余 p 元素
+        removedPs.forEach(({ p, parent, nextSibling }) => {
+          parent.insertBefore(p, nextSibling)
+        })
+        // 还原 blockquote inline style
+        blockquotes.forEach((bq, i) => {
+          if (savedStyles[i]) {
+            bq.setAttribute('style', savedStyles[i])
+          } else {
+            bq.removeAttribute('style')
+          }
+        })
+        // 还原 p 元素 inline style
+        savedPs.forEach(({ el, style }) => {
+          if (style) el.setAttribute('style', style)
+          else el.removeAttribute('style')
+        })
+        // 移除临时 style 标签
+        if (overrideStyle) overrideStyle.remove()
         const link = document.createElement('a')
         link.download = `poster-${Date.now()}.png`
         link.href = canvas.toDataURL('image/png')
         link.click()
         setDownloadLoading(false)
-      }).catch(() => setDownloadLoading(false))
+      }).catch(() => {
+        posterEl.style.backgroundColor = posterOrigBg
+        removedPs.forEach(({ p, parent, nextSibling }) => {
+          parent.insertBefore(p, nextSibling)
+        })
+        blockquotes.forEach((bq, i) => {
+          if (savedStyles[i]) bq.setAttribute('style', savedStyles[i])
+          else bq.removeAttribute('style')
+        })
+        savedPs.forEach(({ el, style }) => {
+          if (style) el.setAttribute('style', style)
+          else el.removeAttribute('style')
+        })
+        if (overrideStyle) overrideStyle.remove()
+        setDownloadLoading(false)
+      })
     }).catch(() => setDownloadLoading(false))
   }
 
   return (
-    <ScrollArea className="h-[96vh] w-full border border-[#00E5CC]/20 rounded-xl my-4 relative bg-[#090d14] shadow-glow-cyan">
+    <div className="h-[96vh] w-full border border-[#00E5CC]/20 rounded-xl my-4 relative bg-[#090d14] shadow-glow-cyan overflow-hidden">
+      <ScrollArea className="h-full w-full">
       <div className="flex flex-row h-full">
         {/* Left: Editor */}
         <div className="w-1/2 border-r border-[#00E5CC]/10 flex flex-col">
@@ -201,12 +372,9 @@ export default function Editor() {
         </div>
 
         {/* Right: Preview */}
-        <div className="w-1/2 mx-auto flex justify-center p-4 bg-[#0d1117] overflow-auto">
-          <div className={`flex flex-col w-fit transition-all duration-300 ${sizeMode === 'mobile' ? 'max-w-[390px] w-[390px]' : ''}`}>
+        <div className="w-1/2 flex justify-center items-start px-4 py-4 bg-[#0d1117] overflow-auto">
+          <div className="flex flex-col w-fit">
             <Md2Poster theme={theme} copySuccessCallback={() => {}} ref={markdownRef}>
-              <Md2PosterHeader className="flex justify-center items-center px-4 font-medium text-lg">
-                <span>{new Date().toISOString().slice(0, 10)}</span>
-              </Md2PosterHeader>
               <Md2PosterContent articleClassName="prose prose-gray prose-img:rounded-lg prose-img:border prose-img:opacity-100 text-justify">{mdString}</Md2PosterContent>
               <Md2PosterFooter className='text-center'>
                 Powered by 青狮龙虾
@@ -218,31 +386,6 @@ export default function Editor() {
 
       {/* Action buttons */}
       <div className="absolute top-4 right-4 flex flex-row gap-2 opacity-80 hover:opacity-100 transition-all">
-
-        {/* Size toggle */}
-        <div className="flex rounded-xl overflow-hidden border border-[#00E5CC]/40 bg-[#131920]">
-          <button
-            onClick={() => setSizeMode('desktop')}
-            className={`px-3 py-2 flex items-center gap-1 text-sm font-semibold transition-colors
-              ${sizeMode === 'desktop'
-                ? 'bg-[#00E5CC]/20 text-[#00E5CC]'
-                : 'text-[hsl(220,14%,55%)] hover:text-[#00E5CC]'}`}
-          >
-            <Monitor className="w-4 h-4" />
-            <span className="text-xs">电脑版</span>
-          </button>
-          <div className="w-px bg-[#00E5CC]/20" />
-          <button
-            onClick={() => setSizeMode('mobile')}
-            className={`px-3 py-2 flex items-center gap-1 text-sm font-semibold transition-colors
-              ${sizeMode === 'mobile'
-                ? 'bg-[#00E5CC]/20 text-[#00E5CC]'
-                : 'text-[hsl(220,14%,55%)] hover:text-[#00E5CC]'}`}
-          >
-            <Smartphone className="w-4 h-4" />
-            <span className="text-xs">手机版</span>
-          </button>
-        </div>
 
         {/* Theme picker */}
         <div className="relative">
@@ -302,5 +445,6 @@ export default function Editor() {
         </Button>
       </div>
     </ScrollArea>
+    </div>
   )
 }
