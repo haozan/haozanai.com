@@ -68,30 +68,23 @@ export default function Editor() {
 
   const handleDownload = () => {
     setDownloadLoading(true)
-    markdownRef?.current?.handleCopy().then(() => {
-      // handleCopy 会把图片写入剪贴板，同时我们用 html2canvas 另存为文件
-      // 降级方案：直接用 html2canvas 截图下载
-      const el = document.querySelector('.md2poster-wrap') as HTMLElement
-        || document.querySelector('[class*="md2poster"]') as HTMLElement
-        || (markdownRef?.current?.posterRef?.current as HTMLElement)
-      if (!el) {
-        setDownloadLoading(false)
-        alert('下载失败，找不到海报元素')
-        return
-      }
-      import('html2canvas').then(({ default: html2canvas }) => {
-        html2canvas(el, { useCORS: true, scale: 2 }).then(canvas => {
-          const link = document.createElement('a')
-          link.download = `poster-${Date.now()}.png`
-          link.href = canvas.toDataURL('image/png')
-          link.click()
-          setDownloadLoading(false)
-        })
-      }).catch(() => setDownloadLoading(false))
-    }).catch((err: any) => {
+    // 找到 markdown-to-image 内部实际渲染的海报 DOM
+    const root = document.querySelector('.markdown-to-image-root') as HTMLElement
+    const posterEl = root?.firstElementChild as HTMLElement
+    if (!posterEl) {
       setDownloadLoading(false)
-      console.log('err downloading', err)
-    })
+      alert('下载失败，找不到海报元素')
+      return
+    }
+    import('html2canvas').then(({ default: html2canvas }) => {
+      html2canvas(posterEl, { useCORS: true, scale: 2 }).then(canvas => {
+        const link = document.createElement('a')
+        link.download = `poster-${Date.now()}.png`
+        link.href = canvas.toDataURL('image/png')
+        link.click()
+        setDownloadLoading(false)
+      }).catch(() => setDownloadLoading(false))
+    }).catch(() => setDownloadLoading(false))
   }
 
   return (
