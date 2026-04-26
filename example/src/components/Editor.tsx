@@ -1,9 +1,9 @@
 'use client';
-import React, { useState, ChangeEvent, TextareaHTMLAttributes, useRef } from 'react'
+import React, { useState, ChangeEvent, useRef } from 'react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from './ui/button'
 import { Md2PosterContent, Md2Poster, Md2PosterHeader, Md2PosterFooter } from 'markdown-to-image'
-import { Copy, LoaderCircle, Download, Palette } from 'lucide-react';
+import { Copy, LoaderCircle, Download, Palette, Monitor, Smartphone, ImageUp } from 'lucide-react';
 
 type IThemeType = 'blue' | 'pink' | 'purple' | 'green' | 'yellow' | 'gray' | 'red' | 'indigo' | 'SpringGradientWave'
 
@@ -19,29 +19,46 @@ const THEMES: { value: IThemeType; label: string }[] = [
   { value: 'indigo', label: '🌌 靛蓝' },
 ]
 
-const Textarea: React.FC<TextareaHTMLAttributes<HTMLTextAreaElement>> = ({ onChange, ...rest }) => {
-  return (
-    <textarea
-      className="border-none bg-[#131920] p-8 w-full resize-none h-full min-h-screen
-        focus-visible:outline-none focus-visible:ring-0 focus-visible:border-0
-        text-[hsl(220,14%,65%)] hover:text-[hsl(220,14%,80%)] focus:text-[hsl(210,20%,90%)]
-        placeholder:text-[hsl(220,14%,35%)] font-light font-mono transition-colors"
-      {...rest}
-      onChange={(e) => onChange?.(e)}
-    />
-  )
-}
+const defaultMd = `# 青狮海报大师 使用指南
 
-const defaultMd = `# AI Morning News - April 29th
-![image](https://imageio.forbes.com/specials-images/imageserve/64b5825a5b9b4d3225e9bd15/artificial-intelligence--ai/960x0.jpg?format=jpg&width=1440)
-1. **MetaElephant Company Releases Multi-Modal Large Model XVERSE-V**: Supports image input of any aspect ratio, performs well in multiple authoritative evaluations, and has been open-sourced.
-2. **Tongyi Qianwen Team Open-Sources Billion-Parameter Model Qwen1.5-110B**: Uses Transformer decoder architecture, supports multiple languages, and has an efficient attention mechanism.
-3. **Shengshu Technology and Tsinghua University Release Video Large Model Vidu**: Adopts a fusion architecture of Diffusion and Transformer, generates high-definition videos with one click, leading internationally.
-4. **Mutable AI Launches Auto Wiki v2**: Automatically converts code into Wikipedia-style articles, solving the problem of code documentation.
-5. **Google Builds New Data Center in the U.S.**: Plans to invest $3 billion to build a data center campus in Indiana, expand facilities in Virginia, and launch an artificial intelligence opportunity fund.
-6. **China Academy of Information and Communications Technology Releases Automobile Large Model Standard**: Aims to standardize and promote the intelligent development of the automotive industry.
-7. Kimi Chat Mobile App Update: Version 1.2.1 completely revamps the user interface, introduces a new light mode, and provides a comfortable and intuitive experience.
-  `
+## 如何使用
+
+本页面内容由 **[青狮龙虾](https://qingclaw.com)** 的技能 **青狮海报大师 Skill** 撰写生成。
+
+使用步骤：
+
+1. 在左侧编辑器中输入或粘贴 Markdown 内容
+2. 右侧实时预览海报效果
+3. 如需插入图片，点击左上角「**上传图片**」按钮
+4. 选择合适的「**主题**」风格
+5. 点击「**下载**」保存为 PNG 图片，或「**复制图片**」直接粘贴使用
+
+---
+
+## 关于青狮龙虾
+
+**青狮龙虾（QingClaw）** 是一款**律师专属 AI 助理**，由镐赞团队出品。
+
+### 核心价值
+
+- 🕐 **节省 90% 时间** —— 处理卷宗、起草文书、整理庭审记录，过去要助理干的活，龙虾全包
+- 🧠 **拉平顶尖律师差距** —— 用自己的 API Key 直连全球顶尖 AI 模型，让新律师也能用上行业大佬同级别的「法律脑」
+- 📣 **提升 3× 运营能力** —— 公众号、小红书、视频脚本、文章，一个人撑起律师品牌全部内容运营
+
+### 交付的 16 项技能（部分）
+
+| 技能 | 场景 |
+|------|------|
+| AI 法律咨询 | 当事人说完案情，秒出法律意见 |
+| AI 合同审核 | 一键输出带批注修订的 Word |
+| AI 文书撰写 | 自动起草起诉状、答辩状、代理意见 |
+| AI 诉讼可视化 | 案件关系图、证据链、时间轴一键生成 |
+| AI 公众号写作 | 输入话题，自动生成律师品牌文章 |
+| AI 小红书图文 | 法律知识变成小红书爆款图文 |
+| **青狮海报大师** | Markdown 一键生成精美海报 ✅ |
+
+> 官网：[qingclaw.com](https://qingclaw.com)
+`
 
 export default function Editor() {
   const [mdString, setMdString] = useState(defaultMd)
@@ -49,10 +66,58 @@ export default function Editor() {
   const [showThemePicker, setShowThemePicker] = useState(false)
   const [copyLoading, setCopyLoading] = useState(false)
   const [downloadLoading, setDownloadLoading] = useState(false)
+  const [uploadLoading, setUploadLoading] = useState(false)
+  const [sizeMode, setSizeMode] = useState<'desktop' | 'mobile'>('mobile')
   const markdownRef = useRef<any>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setMdString(e.target.value)
+  }
+
+  // 在光标位置插入文本
+  const insertAtCursor = (text: string) => {
+    const el = textareaRef.current
+    if (!el) {
+      setMdString(prev => prev + '\n' + text)
+      return
+    }
+    const start = el.selectionStart
+    const end = el.selectionEnd
+    const newVal = mdString.slice(0, start) + text + mdString.slice(end)
+    setMdString(newVal)
+    // 等待 DOM 更新后恢复光标
+    requestAnimationFrame(() => {
+      el.focus()
+      el.setSelectionRange(start + text.length, start + text.length)
+    })
+  }
+
+  // 上传图片到 img.scdn.io
+  const handleUploadImage = async (file: File) => {
+    setUploadLoading(true)
+    try {
+      const formData = new FormData()
+      formData.append('image', file)
+      const res = await fetch('https://img.scdn.io/api/v1.php', {
+        method: 'POST',
+        body: formData,
+      })
+      const json = await res.json()
+      if (json.success && json.data?.url) {
+        const altName = file.name.replace(/\.[^.]+$/, '') || 'image'
+        insertAtCursor(`![${altName}](${json.data.url})`)
+      } else {
+        alert('上传失败：' + (json.message || '未知错误'))
+      }
+    } catch (e) {
+      alert('上传失败，请检查网络连接')
+    } finally {
+      setUploadLoading(false)
+      // 清空 file input，允许重复上传同一文件
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
   }
 
   const handleCopy = () => {
@@ -68,7 +133,6 @@ export default function Editor() {
 
   const handleDownload = () => {
     setDownloadLoading(true)
-    // 找到 markdown-to-image 内部实际渲染的海报 DOM
     const root = document.querySelector('.markdown-to-image-root') as HTMLElement
     const posterEl = root?.firstElementChild as HTMLElement
     if (!posterEl) {
@@ -91,21 +155,60 @@ export default function Editor() {
     <ScrollArea className="h-[96vh] w-full border border-[#00E5CC]/20 rounded-xl my-4 relative bg-[#090d14] shadow-glow-cyan">
       <div className="flex flex-row h-full">
         {/* Left: Editor */}
-        <div className="w-1/2 border-r border-[#00E5CC]/10">
-          <Textarea placeholder="markdown" onChange={handleChange} defaultValue={mdString} />
+        <div className="w-1/2 border-r border-[#00E5CC]/10 flex flex-col">
+          {/* Toolbar */}
+          <div className="flex items-center gap-2 px-4 py-2 border-b border-[#00E5CC]/10 bg-[#0d1117]">
+            {/* 上传图片按钮 */}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadLoading}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
+                border border-[#00E5CC]/30 bg-[#131920] text-[hsl(220,14%,65%)]
+                hover:text-[#00E5CC] hover:border-[#00E5CC]/70 hover:bg-[#00E5CC]/10
+                transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {uploadLoading
+                ? <LoaderCircle className="w-3.5 h-3.5 animate-spin" />
+                : <ImageUp className="w-3.5 h-3.5" />}
+              {uploadLoading ? '上传中...' : '上传图片'}
+            </button>
+            <span className="text-[hsl(220,14%,30%)] text-xs">支持 JPG / PNG / GIF · 自动插入光标</span>
+          </div>
+
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (file) handleUploadImage(file)
+            }}
+          />
+
+          <textarea
+            ref={textareaRef}
+            placeholder="markdown"
+            className="border-none bg-[#131920] p-8 w-full resize-none flex-1 min-h-[calc(100vh-48px)]
+              focus-visible:outline-none focus-visible:ring-0 focus-visible:border-0
+              text-[hsl(220,14%,65%)] hover:text-[hsl(220,14%,80%)] focus:text-[hsl(210,20%,90%)]
+              placeholder:text-[hsl(220,14%,35%)] font-light font-mono transition-colors"
+            value={mdString}
+            onChange={handleChange}
+          />
         </div>
 
         {/* Right: Preview */}
-        <div className="w-1/2 mx-auto flex justify-center p-4 bg-[#0d1117]">
-          <div className="flex flex-col w-fit">
+        <div className="w-1/2 mx-auto flex justify-center p-4 bg-[#0d1117] overflow-auto">
+          <div className={`flex flex-col w-fit transition-all duration-300 ${sizeMode === 'mobile' ? 'max-w-[390px] w-[390px]' : ''}`}>
             <Md2Poster theme={theme} copySuccessCallback={() => {}} ref={markdownRef}>
               <Md2PosterHeader className="flex justify-center items-center px-4 font-medium text-lg">
                 <span>{new Date().toISOString().slice(0, 10)}</span>
               </Md2PosterHeader>
-              <Md2PosterContent>{mdString}</Md2PosterContent>
+              <Md2PosterContent articleClassName="prose prose-gray prose-img:rounded-lg prose-img:border prose-img:opacity-100 text-justify">{mdString}</Md2PosterContent>
               <Md2PosterFooter className='text-center'>
-                <img src="/logo.png" alt="logo" className='inline-block mr-2 w-5' />
-                Powered by QingClaw.com
+                Powered by 青狮龙虾
               </Md2PosterFooter>
             </Md2Poster>
           </div>
@@ -114,6 +217,31 @@ export default function Editor() {
 
       {/* Action buttons */}
       <div className="absolute top-4 right-4 flex flex-row gap-2 opacity-80 hover:opacity-100 transition-all">
+
+        {/* Size toggle */}
+        <div className="flex rounded-xl overflow-hidden border border-[#00E5CC]/40 bg-[#131920]">
+          <button
+            onClick={() => setSizeMode('desktop')}
+            className={`px-3 py-2 flex items-center gap-1 text-sm font-semibold transition-colors
+              ${sizeMode === 'desktop'
+                ? 'bg-[#00E5CC]/20 text-[#00E5CC]'
+                : 'text-[hsl(220,14%,55%)] hover:text-[#00E5CC]'}`}
+          >
+            <Monitor className="w-4 h-4" />
+            <span className="text-xs">电脑版</span>
+          </button>
+          <div className="w-px bg-[#00E5CC]/20" />
+          <button
+            onClick={() => setSizeMode('mobile')}
+            className={`px-3 py-2 flex items-center gap-1 text-sm font-semibold transition-colors
+              ${sizeMode === 'mobile'
+                ? 'bg-[#00E5CC]/20 text-[#00E5CC]'
+                : 'text-[hsl(220,14%,55%)] hover:text-[#00E5CC]'}`}
+          >
+            <Smartphone className="w-4 h-4" />
+            <span className="text-xs">手机版</span>
+          </button>
+        </div>
 
         {/* Theme picker */}
         <div className="relative">

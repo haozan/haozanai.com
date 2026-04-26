@@ -1,0 +1,13 @@
+diff --git a/node_modules/markdown-to-image/dist/markdown-to-image.js b/node_modules/markdown-to-image/dist/markdown-to-image.js
+index b826fc4..dd1ae91 100644
+--- a/node_modules/markdown-to-image/dist/markdown-to-image.js
++++ b/node_modules/markdown-to-image/dist/markdown-to-image.js
+@@ -18456,7 +18456,7 @@ const Qg = ({
+     {
+       components: {
+         img: ({ node: a, src: u, ...s }) => {
+-          const c = u && `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`;
++          const c = u;
+           return /* @__PURE__ */ Ne("img", { ...s, src: c });
+         }
+       },
