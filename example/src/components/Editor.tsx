@@ -9,9 +9,9 @@ import { Copy, LoaderCircle } from 'lucide-react';
 const Textarea: React.FC<TextareaHTMLAttributes<HTMLTextAreaElement>> = ({ onChange, ...rest }) => {
   return (
     <textarea
-      className="border-none bg-gray-100 p-8 w-full resize-none h-full min-h-screen
+      className="border-none bg-purple-50/60 p-8 w-full resize-none h-full min-h-screen
       focus-visible:outline-none focus-visible:ring-0 focus-visible:border-0
-      text-gray-900/70 hover:text-gray-900 focus:text-gray-900 font-light font-inter
+      text-[#4A00E0]/70 hover:text-[#4A00E0] focus:text-[#4A00E0] font-light font-inter
       "
       {...rest}
       onChange={(e) => onChange?.(e)}
@@ -51,7 +51,7 @@ export default function Editor() {
     console.log('copySuccessCallback')
   }
   return (
-    <ScrollArea className="h-[96vh] w-full border-2 border-gray-900 rounded-xl my-4 relative">
+    <ScrollArea className="h-[96vh] w-full border-2 border-[#8E2DE2]/30 rounded-xl my-4 relative">
       <div className="flex flex-row h-full ">
         <div className="w-1/2">
           {/* Edit */}

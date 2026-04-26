@@ -52,6 +52,11 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // 品牌色
+        brand: {
+          primary: "#8E2DE2",
+          secondary: "#4A00E0",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

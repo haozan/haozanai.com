@@ -5,64 +5,70 @@
   @layer base {
     :root {
       --background: 0 0% 100%;
-      --foreground: 224 71.4% 4.1%;
+      --foreground: 270 30% 8%;
 
       --card: 0 0% 100%;
-      --card-foreground: 224 71.4% 4.1%;
+      --card-foreground: 270 30% 8%;
 
       --popover: 0 0% 100%;
-      --popover-foreground: 224 71.4% 4.1%;
+      --popover-foreground: 270 30% 8%;
 
-      --primary: 220.9 39.3% 11%;
-      --primary-foreground: 210 20% 98%;
+      /* 主色 #8E2DE2 → hsl(272 76% 53%) */
+      --primary: 272 76% 53%;
+      --primary-foreground: 0 0% 100%;
 
-      --secondary: 220 14.3% 95.9%;
-      --secondary-foreground: 220.9 39.3% 11%;
+      /* 辅助色 #4A00E0 → hsl(260 100% 44%) */
+      --secondary: 260 40% 94%;
+      --secondary-foreground: 260 100% 44%;
 
-      --muted: 220 14.3% 95.9%;
-      --muted-foreground: 220 8.9% 46.1%;
+      --muted: 270 20% 96%;
+      --muted-foreground: 270 10% 50%;
 
-      --accent: 220 14.3% 95.9%;
-      --accent-foreground: 220.9 39.3% 11%;
+      --accent: 272 60% 92%;
+      --accent-foreground: 272 76% 40%;
 
       --destructive: 0 84.2% 60.2%;
-      --destructive-foreground: 210 20% 98%;
+      --destructive-foreground: 0 0% 100%;
 
-      --border: 220 13% 91%;
-      --input: 220 13% 91%;
-      --ring: 224 71.4% 4.1%;
+      --border: 270 20% 88%;
+      --input: 270 20% 88%;
+      --ring: 272 76% 53%;
 
       --radius: 0.5rem;
+
+      /* 品牌渐变 */
+      --gradient-from: #8E2DE2;
+      --gradient-to: #4A00E0;
     }
 
     .dark {
-      --background: 224 71.4% 4.1%;
-      --foreground: 210 20% 98%;
+      --background: 270 30% 6%;
+      --foreground: 270 20% 96%;
 
-      --card: 224 71.4% 4.1%;
-      --card-foreground: 210 20% 98%;
+      --card: 270 30% 8%;
+      --card-foreground: 270 20% 96%;
 
-      --popover: 224 71.4% 4.1%;
-      --popover-foreground: 210 20% 98%;
+      --popover: 270 30% 8%;
+      --popover-foreground: 270 20% 96%;
 
-      --primary: 210 20% 98%;
-      --primary-foreground: 220.9 39.3% 11%;
+      --primary: 272 76% 63%;
+      --primary-foreground: 0 0% 100%;
 
-      --secondary: 215 27.9% 16.9%;
-      --secondary-foreground: 210 20% 98%;
+      --secondary: 260 30% 18%;
+      --secondary-foreground: 270 20% 96%;
 
-      --muted: 215 27.9% 16.9%;
-      --muted-foreground: 217.9 10.6% 64.9%;
+      --muted: 260 20% 16%;
+      --muted-foreground: 270 10% 60%;
 
-      --accent: 215 27.9% 16.9%;
-      --accent-foreground: 210 20% 98%;
+      --accent: 260 30% 20%;
+      --accent-foreground: 272 76% 70%;
 
-      --destructive: 0 62.8% 30.6%;
-      --destructive-foreground: 210 20% 98%;
+      --destructive: 0 62.8% 40%;
+      --destructive-foreground: 0 0% 100%;
 
-      --border: 215 27.9% 16.9%;
-      --input: 215 27.9% 16.9%;
-      --ring: 216 12.2% 83.9%;
+      --border: 260 20% 20%;
+      --input: 260 20% 20%;
+      --ring: 272 76% 63%;
     }
   }
 
@@ -72,5 +78,21 @@
     }
     body {
       @apply bg-background text-foreground;
+    }
+  }
+
+  /* 品牌渐变工具类 */
+  @layer utilities {
+    .bg-brand-gradient {
+      background: linear-gradient(135deg, var(--gradient-from), var(--gradient-to));
+    }
+    .text-brand-gradient {
+      background: linear-gradient(135deg, var(--gradient-from), var(--gradient-to));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .border-brand {
+      border-color: hsl(var(--primary));
     }
   }
