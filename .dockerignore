@@ -1,0 +1,25 @@
+# git / IDE
+.git
+.gitignore
+.github
+
+# Vite 主库（不需要进容器）
+src/
+public/
+index.html
+vite.config.ts
+tsconfig*.json
+package.json
+package-lock.json
+node_modules/
+dist/
+
+# example 内不需要的
+example/node_modules/
+example/.next/
+example/.env*.local
+
+# 文档 & 杂项
+*.md
+LICENSE
+.storybook/
