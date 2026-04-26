@@ -1,13 +1,13 @@
 # syntax=docker/dockerfile:1
 # ── Stage 1: deps ──────────────────────────────────────────────
-FROM lafzoq0v.mirror.aliyuncs.com/node:20-alpine AS deps
+FROM qinglion-registry.cn-hangzhou.cr.aliyuncs.com/qinglion/haozanai:node-20-alpine AS deps
 WORKDIR /app
 
 COPY example/package.json example/package-lock.json ./
 RUN npm ci --prefer-offline
 
 # ── Stage 2: builder ───────────────────────────────────────────
-FROM lafzoq0v.mirror.aliyuncs.com/node:20-alpine AS builder
+FROM qinglion-registry.cn-hangzhou.cr.aliyuncs.com/qinglion/haozanai:node-20-alpine AS builder
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
@@ -17,7 +17,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # ── Stage 3: runner ────────────────────────────────────────────
-FROM lafzoq0v.mirror.aliyuncs.com/node:20-alpine AS runner
+FROM qinglion-registry.cn-hangzhou.cr.aliyuncs.com/qinglion/haozanai:node-20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
