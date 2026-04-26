@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, ChangeEvent, useRef } from 'react'
+import '@/styles/markdown-to-image-slim.css'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from './ui/button'
 import { Md2PosterContent, Md2Poster, Md2PosterHeader, Md2PosterFooter } from 'markdown-to-image'
