@@ -125,6 +125,15 @@
   line-height: 1.7;
 }
 
+/* 加粗文字 — 浅红色高亮（html2canvas 对 inline padding 渲染偏移，只用 background） */
+.markdown-to-image-root article strong,
+.markdown-to-image-root article b {
+  background: rgba(248, 113, 113, 0.2);
+  border-radius: 2px;
+  font-weight: 700;
+  color: inherit;
+}
+
 /* 有序 / 无序列表 — 完全自定义 marker，避免 outside/inside 位置问题 */
 .markdown-to-image-root article ol,
 .markdown-to-image-root article ul {

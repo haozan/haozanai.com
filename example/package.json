@@ -27,6 +27,7 @@
     "html2canvas": "^1.4.1",
     "lucide-react": "^0.378.0",
     "markdown-to-image": "^0.0.12",
+    "modern-screenshot": "^4.7.0",
     "next": "15.1.6",
     "react": "^18",
     "react-dom": "^18",
