@@ -30,7 +30,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="zh-CN">
+      <head>
+        {/* 预加载背景图，避免主题切换时白屏等待 */}
+        <link rel="preload" as="image" href="/spring-gradient-wave.webp" type="image/webp" />
+      </head>
       <body>
         <Header></Header>{children}<Footer></Footer>
         <Analytics />
