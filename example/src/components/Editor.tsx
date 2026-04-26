@@ -72,13 +72,14 @@ export default function Editor() {
   const markdownRef = useRef<any>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const previewRef = useRef<HTMLDivElement>(null)
 
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setMdString(e.target.value)
   }
 
   // 在光标位置插入文本
-  const insertAtCursor = (text: string) => {
+  const insertAtCursor = (text: string, scrollPreview = false) => {
     const el = textareaRef.current
     if (!el) {
       setMdString(prev => prev + '\n' + text)
@@ -88,10 +89,28 @@ export default function Editor() {
     const end = el.selectionEnd
     const newVal = mdString.slice(0, start) + text + mdString.slice(end)
     setMdString(newVal)
-    // 等待 DOM 更新后恢复光标
+    // 等待 DOM 更新后恢复光标并滚动到插入位置
     requestAnimationFrame(() => {
       el.focus()
-      el.setSelectionRange(start + text.length, start + text.length)
+      const newPos = start + text.length
+      el.setSelectionRange(newPos, newPos)
+      // 计算光标所在行的大致高度，滚动 textarea 让光标可见
+      const lineHeight = parseInt(getComputedStyle(el).lineHeight) || 20
+      const lines = newVal.slice(0, newPos).split('\n').length
+      const scrollTarget = (lines - 1) * lineHeight
+      el.scrollTop = scrollTarget - el.clientHeight / 2
+
+      // 滚动右侧预览区到新插入的图片
+      if (scrollPreview) {
+        setTimeout(() => {
+          const preview = previewRef.current
+          if (!preview) return
+          const imgs = preview.querySelectorAll('img')
+          if (imgs.length === 0) return
+          const lastImg = imgs[imgs.length - 1]
+          lastImg.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }, 300)
+      }
     })
   }
 
@@ -108,7 +127,7 @@ export default function Editor() {
       const json = await res.json()
       if (json.success && json.data?.url) {
         const altName = file.name.replace(/\.[^.]+$/, '') || 'image'
-        insertAtCursor(`![${altName}](${json.data.url})`)
+        insertAtCursor(`![${altName}](${json.data.url})`, true)
       } else {
         alert('上传失败：' + (json.message || '未知错误'))
       }
@@ -235,7 +254,7 @@ export default function Editor() {
         </div>
 
         {/* Right: Preview */}
-        <div className="w-1/2 flex justify-center items-start px-4 py-4 bg-[#0d1117] overflow-auto">
+        <div ref={previewRef} className="w-1/2 flex justify-center items-start px-4 py-4 bg-[#0d1117] overflow-auto">
           <div className="flex flex-col w-fit">
             <Md2Poster theme={theme} copySuccessCallback={() => {}} ref={markdownRef}>
               <Md2PosterContent articleClassName="prose prose-gray prose-img:rounded-lg prose-img:border prose-img:opacity-100 text-justify">{mdString}</Md2PosterContent>
