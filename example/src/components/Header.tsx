@@ -16,6 +16,18 @@ export default function Header() {
               青狮海报大师
             </span>
           </Link>
+          <span className="hidden sm:inline text-[hsl(220,14%,40%)] text-xs font-normal tracking-normal">
+            由律师专属 AI 助理{' '}
+            <a
+              href="https://qingclaw.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#00E5CC]/70 hover:text-[#00E5CC] transition-colors"
+            >
+              青狮龙虾
+            </a>
+            {' '}驱动
+          </span>
         </div>
       </div>
     </nav>
