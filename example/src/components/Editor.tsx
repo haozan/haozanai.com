@@ -4,7 +4,7 @@ import '@/styles/markdown-to-image-slim.css'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from './ui/button'
 import { Md2PosterContent, Md2Poster, Md2PosterFooter } from 'markdown-to-image'
-import { Copy, LoaderCircle, Download, Palette, ImageUp, FileEdit, Eye } from 'lucide-react'
+import { Copy, LoaderCircle, Download, Palette, ImageUp, FileEdit, Eye, Eraser } from 'lucide-react'
 import { domToPng } from 'modern-screenshot'
 
 type IThemeType = 'SpringGradientWave'
@@ -337,6 +337,19 @@ export default function Editor() {
                   {uploadLoading ? '上传中...' : '插入图片'}
                 </button>
                 <span className="text-[hsl(220,14%,30%)] text-xs">支持 JPG / PNG / GIF · 自动插入光标</span>
+
+                {/* 清空内容 */}
+                <button
+                  onClick={() => { if (window.confirm('确定清空全部内容？')) setMdString('') }}
+                  className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
+                    border border-red-500/20 bg-[#131920] text-[hsl(220,14%,45%)]
+                    hover:text-red-400 hover:border-red-400/50 hover:bg-red-400/10
+                    transition-all"
+                  title="清空内容"
+                >
+                  <Eraser className="w-3.5 h-3.5" />
+                  清空
+                </button>
               </div>
 
               <textarea
@@ -395,21 +408,34 @@ export default function Editor() {
             预览
           </button>
 
-          {/* 插入图片（仅编辑 tab 显示） */}
+          {/* 插入图片 + 清空（仅编辑 tab 显示） */}
           {mobileTab === 'edit' && (
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploadLoading}
-              className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
-                border border-[#00E5CC]/30 bg-[#131920] text-[hsl(220,14%,65%)]
-                hover:text-[#00E5CC] hover:border-[#00E5CC]/70 hover:bg-[#00E5CC]/10
-                transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {uploadLoading
-                ? <LoaderCircle className="w-3.5 h-3.5 animate-spin" />
-                : <ImageUp className="w-3.5 h-3.5" />}
-              {uploadLoading ? '上传中' : '插入图片'}
-            </button>
+            <div className="ml-auto flex items-center gap-2">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadLoading}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
+                  border border-[#00E5CC]/30 bg-[#131920] text-[hsl(220,14%,65%)]
+                  hover:text-[#00E5CC] hover:border-[#00E5CC]/70 hover:bg-[#00E5CC]/10
+                  transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {uploadLoading
+                  ? <LoaderCircle className="w-3.5 h-3.5 animate-spin" />
+                  : <ImageUp className="w-3.5 h-3.5" />}
+                {uploadLoading ? '上传中' : '插入图片'}
+              </button>
+              <button
+                onClick={() => { if (window.confirm('确定清空全部内容？')) setMdString('') }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
+                  border border-red-500/20 bg-[#131920] text-[hsl(220,14%,45%)]
+                  hover:text-red-400 hover:border-red-400/50 hover:bg-red-400/10
+                  transition-all"
+                title="清空内容"
+              >
+                <Eraser className="w-3.5 h-3.5" />
+                清空
+              </button>
+            </div>
           )}
         </div>
 
