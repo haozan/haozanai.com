@@ -4,7 +4,7 @@ import '@/styles/markdown-to-image-slim.css'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from './ui/button'
 import { Md2PosterContent, Md2Poster, Md2PosterFooter } from 'markdown-to-image'
-import { Copy, LoaderCircle, Download, Palette, ImageUp } from 'lucide-react'
+import { Copy, LoaderCircle, Download, Palette, ImageUp, FileEdit, Eye } from 'lucide-react'
 import { domToPng } from 'modern-screenshot'
 
 type IThemeType = 'SpringGradientWave'
@@ -89,6 +89,8 @@ export default function Editor() {
   const [copyLoading, setCopyLoading] = useState(false)
   const [downloadLoading, setDownloadLoading] = useState(false)
   const [uploadLoading, setUploadLoading] = useState(false)
+  // 移动端 tab：'edit' | 'preview'
+  const [mobileTab, setMobileTab] = useState<'edit' | 'preview'>('edit')
   const markdownRef = useRef<any>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -109,18 +111,15 @@ export default function Editor() {
     const end = el.selectionEnd
     const newVal = mdString.slice(0, start) + text + mdString.slice(end)
     setMdString(newVal)
-    // 等待 DOM 更新后恢复光标并滚动到插入位置
     requestAnimationFrame(() => {
       el.focus()
       const newPos = start + text.length
       el.setSelectionRange(newPos, newPos)
-      // 计算光标所在行的大致高度，滚动 textarea 让光标可见
       const lineHeight = parseInt(getComputedStyle(el).lineHeight) || 20
       const lines = newVal.slice(0, newPos).split('\n').length
       const scrollTarget = (lines - 1) * lineHeight
       el.scrollTop = scrollTarget - el.clientHeight / 2
 
-      // 滚动右侧预览区到新插入的图片
       if (scrollPreview) {
         setTimeout(() => {
           const preview = previewRef.current
@@ -134,7 +133,7 @@ export default function Editor() {
     })
   }
 
-  // 上传图片到本地服务器（/api/upload），用完即删，无需第三方图床
+  // 上传图片到本地服务器
   const handleUploadImage = async (file: File) => {
     setUploadLoading(true)
     try {
@@ -155,7 +154,6 @@ export default function Editor() {
       alert('上传失败，请检查网络连接')
     } finally {
       setUploadLoading(false)
-      // 清空 file input，允许重复上传同一文件
       if (fileInputRef.current) fileInputRef.current.value = ''
     }
   }
@@ -173,7 +171,6 @@ export default function Editor() {
 
   const handleDownload = async () => {
     setDownloadLoading(true)
-    // CSS counter() 在 SVG foreignObject 里不生效，截图前把 ol li 序号固化为真实 DOM span
     const injectedSpans: HTMLElement[] = []
     try {
       const root = document.querySelector('.markdown-to-image-root') as HTMLElement
@@ -183,7 +180,6 @@ export default function Editor() {
         return
       }
 
-      // 为每个 ol > li 注入序号 span（截图后移除）
       document.body.classList.add('screenshot-mode')
       const olLists = posterEl.querySelectorAll<HTMLOListElement>('article ol')
       olLists.forEach((ol) => {
@@ -217,26 +213,184 @@ export default function Editor() {
       console.error('下载失败', e)
       alert('下载失败，请重试')
     } finally {
-      // 清理注入的 span
       injectedSpans.forEach((s) => s.remove())
       document.body.classList.remove('screenshot-mode')
       setDownloadLoading(false)
     }
   }
 
+  // ── 共享的海报预览节点 ──
+  const posterNode = (
+    <Md2Poster
+      theme={'SpringGradientWave'}
+      className={
+        theme in GRADIENT_CLASS_MAP
+          ? GRADIENT_CLASS_MAP[theme as IGradientTheme]
+          : undefined
+      }
+      copySuccessCallback={() => {}} ref={markdownRef}>
+      <Md2PosterContent articleClassName="prose prose-gray prose-img:rounded-lg prose-img:border prose-img:opacity-100 text-justify">
+        {mdString}
+      </Md2PosterContent>
+      <Md2PosterFooter className='text-center'>
+        Powered by 青狮龙虾
+      </Md2PosterFooter>
+    </Md2Poster>
+  )
+
+  // ── 操作按钮组（桌面端右上角 / 移动端底部栏复用）──
+  const actionButtons = (isMobile = false) => (
+    <>
+      {/* Theme picker */}
+      <div className="relative">
+        <Button
+          className="rounded-xl bg-[#131920] text-[#00E5CC] font-semibold border border-[#00E5CC]/40
+            hover:bg-[#00E5CC]/10 hover:border-[#00E5CC]/80 transition-all h-9 px-3 text-sm"
+          onClick={() => setShowThemePicker(v => !v)}
+        >
+          <Palette className="w-4 h-4 mr-1 shrink-0" />
+          <span className="hidden sm:inline">主题</span>
+        </Button>
+
+        {showThemePicker && (
+          <div className={`absolute z-50 bg-[#131920] border border-[#00E5CC]/20
+            rounded-xl shadow-glow-cyan p-2 flex flex-col gap-1 min-w-[150px]
+            ${isMobile ? 'bottom-11 right-0' : 'top-11 right-0'}`}>
+            {THEMES.map(t => (
+              <button
+                key={t.value}
+                onClick={() => { setTheme(t.value); setShowThemePicker(false) }}
+                className={`px-3 py-2 rounded-lg text-sm text-left transition-colors
+                  ${theme === t.value
+                    ? 'bg-[#00E5CC]/20 text-[#00E5CC] font-semibold'
+                    : 'text-[hsl(220,14%,65%)] hover:bg-[#00E5CC]/10 hover:text-[#00E5CC]'
+                  }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Download */}
+      <Button
+        className="rounded-xl bg-[#131920] text-[#00E5CC] font-semibold border border-[#00E5CC]/40
+          hover:bg-[#00E5CC]/10 hover:border-[#00E5CC]/80 transition-all h-9 px-3 text-sm"
+        onClick={handleDownload}
+        disabled={downloadLoading}
+      >
+        {downloadLoading
+          ? <LoaderCircle className="w-4 h-4 mr-1 animate-spin shrink-0" />
+          : <Download className="w-4 h-4 mr-1 shrink-0" />}
+        <span className="hidden sm:inline">下载</span>
+      </Button>
+
+      {/* Copy */}
+      <Button
+        className="rounded-xl bg-[#00E5CC] text-[#090d14] font-semibold
+          hover:bg-[#00E5CC]/90 shadow-glow-cyan border-0 h-9 px-3 text-sm"
+        onClick={handleCopy}
+        disabled={copyLoading}
+      >
+        {copyLoading
+          ? <LoaderCircle className="w-4 h-4 mr-1 animate-spin shrink-0" />
+          : <Copy className="w-4 h-4 mr-1 shrink-0" />}
+        复制图片
+      </Button>
+    </>
+  )
+
   return (
-    <div className="h-[96vh] w-full border border-[#00E5CC]/20 rounded-xl my-4 relative bg-[#090d14] shadow-glow-cyan overflow-hidden">
-      <ScrollArea className="h-full w-full">
-      <div className="flex flex-row h-full">
-        {/* Left: Editor */}
-        <div className="w-1/2 border-r border-[#00E5CC]/10 flex flex-col">
-          {/* Toolbar */}
-          <div className="flex items-center gap-2 px-4 py-2 border-b border-[#00E5CC]/10 bg-[#0d1117]">
-            {/* 上传图片按钮 */}
+    <>
+      {/* ════════════════════════════════════════
+          桌面端布局（md 及以上）
+      ════════════════════════════════════════ */}
+      <div className="hidden md:flex flex-col h-[96vh] w-full border border-[#00E5CC]/20 rounded-xl my-4 relative bg-[#090d14] shadow-glow-cyan overflow-hidden">
+        <ScrollArea className="h-full w-full">
+          <div className="flex flex-row h-full">
+            {/* Left: Editor */}
+            <div className="w-1/2 border-r border-[#00E5CC]/10 flex flex-col">
+              {/* Toolbar */}
+              <div className="flex items-center gap-2 px-4 py-2 border-b border-[#00E5CC]/10 bg-[#0d1117]">
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadLoading}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
+                    border border-[#00E5CC]/30 bg-[#131920] text-[hsl(220,14%,65%)]
+                    hover:text-[#00E5CC] hover:border-[#00E5CC]/70 hover:bg-[#00E5CC]/10
+                    transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {uploadLoading
+                    ? <LoaderCircle className="w-3.5 h-3.5 animate-spin" />
+                    : <ImageUp className="w-3.5 h-3.5" />}
+                  {uploadLoading ? '上传中...' : '插入图片'}
+                </button>
+                <span className="text-[hsl(220,14%,30%)] text-xs">支持 JPG / PNG / GIF · 自动插入光标</span>
+              </div>
+
+              <textarea
+                ref={textareaRef}
+                placeholder="markdown"
+                className="border-none bg-[#131920] p-8 w-full resize-none flex-1 min-h-[calc(100vh-48px)]
+                  focus-visible:outline-none focus-visible:ring-0 focus-visible:border-0
+                  text-[hsl(220,14%,65%)] hover:text-[hsl(220,14%,80%)] focus:text-[hsl(210,20%,90%)]
+                  placeholder:text-[hsl(220,14%,35%)] font-light font-mono transition-colors"
+                value={mdString}
+                onChange={handleChange}
+              />
+            </div>
+
+            {/* Right: Preview */}
+            <div ref={previewRef} className="w-1/2 flex justify-center items-start px-4 py-4 bg-[#0d1117] overflow-auto">
+              <div className="flex flex-col w-fit">
+                {posterNode}
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop action buttons */}
+          <div className="absolute top-4 right-4 flex flex-row gap-2 opacity-80 hover:opacity-100 transition-all">
+            {actionButtons(false)}
+          </div>
+        </ScrollArea>
+      </div>
+
+      {/* ════════════════════════════════════════
+          移动端布局（小于 md）
+      ════════════════════════════════════════ */}
+      <div className="flex md:hidden flex-col w-full border border-[#00E5CC]/20 rounded-xl my-3 bg-[#090d14] shadow-glow-cyan overflow-hidden"
+        style={{ height: 'calc(100dvh - 80px)' }}>
+
+        {/* 顶部 Tab 切换栏 */}
+        <div className="flex items-center bg-[#0d1117] border-b border-[#00E5CC]/10 px-3 py-2 gap-2 shrink-0">
+          <button
+            onClick={() => setMobileTab('edit')}
+            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all
+              ${mobileTab === 'edit'
+                ? 'bg-[#00E5CC]/15 text-[#00E5CC] border border-[#00E5CC]/40'
+                : 'text-[hsl(220,14%,55%)] border border-transparent hover:text-[#00E5CC]/70'}`}
+          >
+            <FileEdit className="w-4 h-4" />
+            编辑
+          </button>
+          <button
+            onClick={() => setMobileTab('preview')}
+            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all
+              ${mobileTab === 'preview'
+                ? 'bg-[#00E5CC]/15 text-[#00E5CC] border border-[#00E5CC]/40'
+                : 'text-[hsl(220,14%,55%)] border border-transparent hover:text-[#00E5CC]/70'}`}
+          >
+            <Eye className="w-4 h-4" />
+            预览
+          </button>
+
+          {/* 插入图片（仅编辑 tab 显示） */}
+          {mobileTab === 'edit' && (
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadLoading}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
+              className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
                 border border-[#00E5CC]/30 bg-[#131920] text-[hsl(220,14%,65%)]
                 hover:text-[#00E5CC] hover:border-[#00E5CC]/70 hover:bg-[#00E5CC]/10
                 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
@@ -244,116 +398,56 @@ export default function Editor() {
               {uploadLoading
                 ? <LoaderCircle className="w-3.5 h-3.5 animate-spin" />
                 : <ImageUp className="w-3.5 h-3.5" />}
-              {uploadLoading ? '上传中...' : '插入图片'}
+              {uploadLoading ? '上传中' : '插入图片'}
             </button>
-            <span className="text-[hsl(220,14%,30%)] text-xs">支持 JPG / PNG / GIF · 自动插入光标</span>
-          </div>
-
-          {/* Hidden file input */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0]
-              if (file) handleUploadImage(file)
-            }}
-          />
-
-          <textarea
-            ref={textareaRef}
-            placeholder="markdown"
-            className="border-none bg-[#131920] p-8 w-full resize-none flex-1 min-h-[calc(100vh-48px)]
-              focus-visible:outline-none focus-visible:ring-0 focus-visible:border-0
-              text-[hsl(220,14%,65%)] hover:text-[hsl(220,14%,80%)] focus:text-[hsl(210,20%,90%)]
-              placeholder:text-[hsl(220,14%,35%)] font-light font-mono transition-colors"
-            value={mdString}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Right: Preview */}
-        <div ref={previewRef} className="w-1/2 flex justify-center items-start px-4 py-4 bg-[#0d1117] overflow-auto">
-          <div className="flex flex-col w-fit">
-            <Md2Poster
-              theme={'SpringGradientWave'}
-              className={
-                theme in GRADIENT_CLASS_MAP
-                  ? GRADIENT_CLASS_MAP[theme as IGradientTheme]
-                  : undefined
-              }
-              copySuccessCallback={() => {}} ref={markdownRef}>
-              <Md2PosterContent articleClassName="prose prose-gray prose-img:rounded-lg prose-img:border prose-img:opacity-100 text-justify">{mdString}</Md2PosterContent>
-              <Md2PosterFooter className='text-center'>
-                Powered by 青狮龙虾
-              </Md2PosterFooter>
-            </Md2Poster>
-          </div>
-        </div>
-      </div>
-
-      {/* Action buttons */}
-      <div className="absolute top-4 right-4 flex flex-row gap-2 opacity-80 hover:opacity-100 transition-all">
-
-        {/* Theme picker */}
-        <div className="relative">
-          <Button
-            className="rounded-xl bg-[#131920] text-[#00E5CC] font-semibold border border-[#00E5CC]/40
-              hover:bg-[#00E5CC]/10 hover:border-[#00E5CC]/80 transition-all"
-            onClick={() => setShowThemePicker(v => !v)}
-          >
-            <Palette className="w-4 h-4 mr-1" />
-            主题
-          </Button>
-
-          {showThemePicker && (
-            <div className="absolute right-0 top-11 z-50 bg-[#131920] border border-[#00E5CC]/20
-              rounded-xl shadow-glow-cyan p-2 flex flex-col gap-1 min-w-[140px]">
-              {THEMES.map(t => (
-                <button
-                  key={t.value}
-                  onClick={() => { setTheme(t.value); setShowThemePicker(false) }}
-                  className={`px-3 py-2 rounded-lg text-sm text-left transition-colors
-                    ${theme === t.value
-                      ? 'bg-[#00E5CC]/20 text-[#00E5CC] font-semibold'
-                      : 'text-[hsl(220,14%,65%)] hover:bg-[#00E5CC]/10 hover:text-[#00E5CC]'
-                    }`}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
           )}
         </div>
 
-        {/* Download button */}
-        <Button
-          className="rounded-xl bg-[#131920] text-[#00E5CC] font-semibold border border-[#00E5CC]/40
-            hover:bg-[#00E5CC]/10 hover:border-[#00E5CC]/80 transition-all"
-          onClick={handleDownload}
-          disabled={downloadLoading}
-        >
-          {downloadLoading
-            ? <LoaderCircle className="w-4 h-4 mr-1 animate-spin" />
-            : <Download className="w-4 h-4 mr-1" />}
-          下载
-        </Button>
+        {/* 内容区 */}
+        <div className="flex-1 overflow-hidden relative">
+          {/* 编辑面板 */}
+          <div className={`absolute inset-0 transition-opacity duration-200 ${mobileTab === 'edit' ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+            <textarea
+              ref={textareaRef}
+              placeholder="在此输入 Markdown 内容..."
+              className="border-none bg-[#131920] p-4 w-full h-full resize-none
+                focus-visible:outline-none focus-visible:ring-0 focus-visible:border-0
+                text-[hsl(220,14%,65%)] hover:text-[hsl(220,14%,80%)] focus:text-[hsl(210,20%,90%)]
+                placeholder:text-[hsl(220,14%,35%)] font-light font-mono text-sm transition-colors"
+              value={mdString}
+              onChange={handleChange}
+            />
+          </div>
 
-        {/* Copy button */}
-        <Button
-          className="rounded-xl bg-[#00E5CC] text-[#090d14] font-semibold
-            hover:bg-[#00E5CC]/90 shadow-glow-cyan border-0"
-          onClick={handleCopy}
-          disabled={copyLoading}
-        >
-          {copyLoading
-            ? <LoaderCircle className="w-4 h-4 mr-1 animate-spin" />
-            : <Copy className="w-4 h-4 mr-1" />}
-          复制图片
-        </Button>
+          {/* 预览面板 */}
+          <div
+            ref={previewRef}
+            className={`absolute inset-0 overflow-y-auto bg-[#0d1117] flex justify-center px-3 py-4 transition-opacity duration-200
+              ${mobileTab === 'preview' ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+          >
+            <div className="w-full max-w-[400px]">
+              {posterNode}
+            </div>
+          </div>
+        </div>
+
+        {/* 底部操作栏 */}
+        <div className="shrink-0 flex items-center justify-end gap-2 px-3 py-2 bg-[#0d1117] border-t border-[#00E5CC]/10">
+          {actionButtons(true)}
+        </div>
       </div>
-    </ScrollArea>
-    </div>
+
+      {/* Hidden file input (共享) */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0]
+          if (file) handleUploadImage(file)
+        }}
+      />
+    </>
   )
 }

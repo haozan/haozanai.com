@@ -87,10 +87,17 @@
   border-radius: 0 !important;
 }
 
-/* ── 海报内容区：加宽 ── */
+/* ── 海报内容区：桌面端加宽，移动端自适应 ── */
 .markdown-to-image-root > div {
   max-width: 560px !important;
   width: 560px !important;
+}
+
+@media (max-width: 767px) {
+  .markdown-to-image-root > div {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
 }
 
 /* ── 海报内容区：修复排版错位（markdown-to-image CSS reset 清零了大量样式） ── */
