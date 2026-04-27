@@ -219,8 +219,8 @@ export default function Editor() {
     }
   }
 
-  // ── 共享的海报预览节点 ──
-  const posterNode = (
+  // ── 海报预览节点（函数形式，每次调用独立实例，避免同一 JSX 节点被渲染两次）──
+  const renderPoster = (ref?: React.Ref<any>) => (
     <Md2Poster
       theme={'SpringGradientWave'}
       className={
@@ -228,7 +228,7 @@ export default function Editor() {
           ? GRADIENT_CLASS_MAP[theme as IGradientTheme]
           : undefined
       }
-      copySuccessCallback={() => {}} ref={markdownRef}>
+      copySuccessCallback={() => {}} ref={ref}>
       <Md2PosterContent articleClassName="prose prose-gray prose-img:rounded-lg prose-img:border prose-img:opacity-100 text-justify">
         {mdString}
       </Md2PosterContent>
@@ -344,7 +344,7 @@ export default function Editor() {
             {/* Right: Preview */}
             <div ref={previewRef} className="w-1/2 flex justify-center items-start px-4 py-4 bg-[#0d1117] overflow-auto">
               <div className="flex flex-col w-fit">
-                {posterNode}
+                {renderPoster(markdownRef)}
               </div>
             </div>
           </div>
@@ -426,7 +426,7 @@ export default function Editor() {
               ${mobileTab === 'preview' ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
           >
             <div className="w-full max-w-[400px]">
-              {posterNode}
+              {renderPoster(null)}
             </div>
           </div>
         </div>
