@@ -315,7 +315,8 @@ export default function Editor() {
       {/* ════════════════════════════════════════
           桌面端布局（md 及以上）
       ════════════════════════════════════════ */}
-      <div className="hidden md:flex flex-col h-[96vh] w-full border border-[#00E5CC]/20 rounded-xl my-4 relative bg-[#090d14] shadow-glow-cyan overflow-hidden">
+      <div className="flex flex-col h-[96vh] w-full border border-[#00E5CC]/20 rounded-xl my-4 relative bg-[#090d14] shadow-glow-cyan overflow-hidden"
+        style={{ display: isMobile ? 'none' : 'flex' }}>
         <ScrollArea className="h-full w-full">
           <div className="flex flex-row h-full">
             {/* Left: Editor */}
@@ -368,8 +369,8 @@ export default function Editor() {
       {/* ════════════════════════════════════════
           移动端布局（小于 md）
       ════════════════════════════════════════ */}
-      <div className="flex md:hidden flex-col w-full border border-[#00E5CC]/20 rounded-xl my-3 bg-[#090d14] shadow-glow-cyan overflow-hidden"
-        style={{ height: 'calc(100dvh - 80px)' }}>
+      <div className="flex flex-col w-full border border-[#00E5CC]/20 rounded-xl my-3 bg-[#090d14] shadow-glow-cyan overflow-hidden"
+        style={{ display: isMobile ? 'flex' : 'none', height: 'calc(100dvh - 80px)' }}>
 
         {/* 顶部 Tab 切换栏 */}
         <div className="flex items-center bg-[#0d1117] border-b border-[#00E5CC]/10 px-3 py-2 gap-2 shrink-0">
