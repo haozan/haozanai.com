@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { readFile, stat } from 'fs/promises'
 import path from 'path'
+import { createHash } from 'crypto'
 
 const UPLOAD_DIR = '/tmp/haozanai-uploads'
 
@@ -15,7 +16,7 @@ const MIME: Record<string, string> = {
 }
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ filename: string }> }
 ) {
   const { filename } = await params
@@ -28,16 +29,38 @@ export async function GET(
   const filePath = path.join(UPLOAD_DIR, filename)
 
   try {
-    await stat(filePath) // 文件不存在会 throw
-    const buffer = await readFile(filePath)
+    const fileStat = await stat(filePath)
     const ext = filename.split('.').pop()?.toLowerCase() || ''
     const contentType = MIME[ext] || 'application/octet-stream'
+
+    // ETag：文件大小 + 最后修改时间的 hash，轻量且足够唯一
+    const etag = `"${createHash('md5')
+      .update(`${fileStat.size}-${fileStat.mtimeMs}`)
+      .digest('hex')}"`
+
+    // 304 协商缓存：如果浏览器携带 If-None-Match 且匹配，直接返回 304
+    const ifNoneMatch = req.headers.get('if-none-match')
+    if (ifNoneMatch === etag) {
+      return new NextResponse(null, {
+        status: 304,
+        headers: {
+          'ETag': etag,
+          'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400',
+        },
+      })
+    }
+
+    const buffer = await readFile(filePath)
 
     return new NextResponse(buffer, {
       status: 200,
       headers: {
         'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=86400', // 缓存 1 天
+        'Content-Length': String(buffer.length),
+        // 强缓存 7 天 + 过期后 stale-while-revalidate 允许后台刷新
+        'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400',
+        'ETag': etag,
+        'Last-Modified': fileStat.mtime.toUTCString(),
       },
     })
   } catch {
