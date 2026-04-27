@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, ChangeEvent, useRef } from 'react'
+import React, { useState, ChangeEvent, useRef, useEffect } from 'react'
 import '@/styles/markdown-to-image-slim.css'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from './ui/button'
@@ -91,6 +91,15 @@ export default function Editor() {
   const [uploadLoading, setUploadLoading] = useState(false)
   // 移动端 tab：'edit' | 'preview'
   const [mobileTab, setMobileTab] = useState<'edit' | 'preview'>('edit')
+  // 是否为移动端（< 768px），用于避免桌面端挂载移动端海报节点
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)')
+    setIsMobile(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
   const markdownRef = useRef<any>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -426,7 +435,7 @@ export default function Editor() {
               ${mobileTab === 'preview' ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
           >
             <div className="w-full max-w-[400px]">
-              {renderPoster(null)}
+              {isMobile && mobileTab === 'preview' && renderPoster(null)}
             </div>
           </div>
         </div>
